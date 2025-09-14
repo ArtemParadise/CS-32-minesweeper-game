@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minesweeper — Lavender UI (10x10 Demo)</title>
+  <style>
+    :root {
+      --bg: #f5f0fa;
+      --panel: #e6def4;
+      --panel-2: #d8c8f0;
+      --border: #b8a6db;
+      --lavender: #c3b1e1;
+      --lavender-3: #a281d9;
+      --accent: #b57edc;
+      --danger: #ef4444;
+      --text: #2f2547;
+      --cell-face: #ede6fa;
+      --cell-face-2: #e0d6f5;
+      --cell-edge-top: #cab8e5;
+      --cell-edge-bot: #b19ad7;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .frame {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      background: var(--panel-2);
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+
+    .stat { font-weight: bold; color: var(--text); }
+
+    .btn {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 36px);
+      grid-template-rows: repeat(10, 36px);
+      gap: 4px;
+      justify-content: center;
+      background: var(--panel-2);
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .cell {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: var(--cell-face);
+      border: 1px solid var(--cell-edge-top);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .cell.open { background: var(--cell-face-2); border: 1px solid var(--cell-edge-bot); }
+    .n1 { color: #3b82f6; }
+    .n2 { color: #16a34a; }
+    .n3 { color: #dc2626; }
+    .n4 { color: #7c3aed; }
+    .n5 { color: #b45309; }
+    .n6 { color: #0891b2; }
+    .n7 { color: #4b5563; }
+    .n8 { color: #000000; }
+    .cell.flag::after { content: "🚩"; }
+    .cell.mine::after { content: "💣"; }
+    .cell.exploded { background: var(--danger); color: white; }
+
+    .legend {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .legend h3 { margin-top: 0; color: var(--lavender-3); }
+    .legend ul { margin: 0; padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="toolbar">
+      <div class="stat">⏱ 000</div>
+      <button class="btn">Нова гра</button>
+      <div class="stat">🚩 015</div>
+    </div>
+    <div class="grid">
+      <!-- Поле 10x10 заповнене випадковими клітинками -->
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell flag"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell mine"></div>
+      <div class="cell open"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell"></div>
+      <div class="cell open n5">5</div>
+
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell open n6">6</div>
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+
+      <div class="cell open"></div>
+      <div class="cell flag"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell open n7">7</div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open n8">8</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell flag"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n5">5</div>
+
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n6">6</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell exploded">💥</div>
+    </div>
+
+    <div class="legend">
+      <h3>Опис клітинок</h3>
+      <ul>
+        <li><b>Закрита клітинка</b> — ще не відкрита користувачем.</li>
+        <li><b>Відкрита порожня клітинка</b> — немає мін поруч.</li>
+        <li><b>Цифри (1–8)</b> — показують кількість мін навколо.</li>
+        <li><b>Прапорець 🚩</b> — користувач позначив підозру на міну.</li>
+        <li><b>Міна 💣</b> — відображається після програшу.</li>
+        <li><b>Вибух 💥</b> — клітинка, на яку користувач натиснув і підрився на міні.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
