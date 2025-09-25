@@ -4,113 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Minesweeper — Lavender UI (10x10 Demo)</title>
-  <style>
-    :root {
-      --bg: #f5f0fa;
-      --panel: #e6def4;
-      --panel-2: #d8c8f0;
-      --border: #b8a6db;
-      --lavender: #c3b1e1;
-      --lavender-3: #a281d9;
-      --accent: #b57edc;
-      --danger: #ef4444;
-      --text: #2f2547;
-      --cell-face: #ede6fa;
-      --cell-face-2: #e0d6f5;
-      --cell-edge-top: #cab8e5;
-      --cell-edge-bot: #b19ad7;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px;
-    }
-
-    .frame {
-      background: var(--panel);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,.2);
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      background: var(--panel-2);
-      padding: 8px 12px;
-      border-radius: 8px;
-    }
-
-    .stat { font-weight: bold; color: var(--text); }
-
-    .btn {
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(10, 36px);
-      grid-template-rows: repeat(10, 36px);
-      gap: 4px;
-      justify-content: center;
-      background: var(--panel-2);
-      padding: 8px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-    }
-
-    .cell {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: var(--cell-face);
-      border: 1px solid var(--cell-edge-top);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-      user-select: none;
-    }
-
-    .cell.open { background: var(--cell-face-2); border: 1px solid var(--cell-edge-bot); }
-    .n1 { color: #3b82f6; }
-    .n2 { color: #16a34a; }
-    .n3 { color: #dc2626; }
-    .n4 { color: #7c3aed; }
-    .n5 { color: #b45309; }
-    .n6 { color: #0891b2; }
-    .n7 { color: #4b5563; }
-    .n8 { color: #000000; }
-    .cell.flag::after { content: "🚩"; }
-    .cell.mine::after { content: "💣"; }
-    .cell.exploded { background: var(--danger); color: white; }
-
-    .legend {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 14px;
-      color: var(--text);
-    }
-    .legend h3 { margin-top: 0; color: var(--lavender-3); }
-    .legend ul { margin: 0; padding-left: 20px; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="frame">
@@ -244,5 +138,6 @@
       </ul>
     </div>
   </div>
+  <script src="script.js"></script>
 </body>
 </html>
