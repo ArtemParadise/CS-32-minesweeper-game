@@ -146,6 +146,7 @@ openCell(game, 1, 6);
 openCell(game, 1, 7);
 openCell(game, 1, 8);
 console.log(game);
+console.log(countNeighbourMines(game.field, 3, 0));
 toggleFlag(game, 1, 1);
 console.log(game.field[1][1]);
 stopTimer();
