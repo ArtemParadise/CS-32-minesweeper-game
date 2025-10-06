@@ -19,7 +19,6 @@ function makeCell(hasMine = false) {
     state: CellState.CLOSED,
   };
 }
-
 // Расстановка мин
 function placeMines({ field, mines, rows, cols }) {
   let placedMines = 0;
