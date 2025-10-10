@@ -18,6 +18,38 @@ function createCell(hasMine = false, adjacentMines = 0, state = CellState.CLOSED
     };
 }
 
+const directions = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1],
+];
+
+function getAdjacentCells(board, row, col) {
+    const cells = [];
+    const rows = board.length;
+    const cols = board[0].length;
+    for (const [dr, dc] of directions) {
+        const nr = row + dr;
+        const nc = col + dc;
+
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+            cells.push(board[nr][nc]);
+        }
+    }
+    return cells;
+}
+
+function countAdjacentMines(board, row, col) {
+    let count = 0;
+    const rows = board.length;
+    const cols = board[0].length;
+    const adjacentCells = getAdjacentCells(board, row, col);
+    adjacentCells.forEach(cell => {
+        if (cell.hasMine) count++;
+    });
+    return count;
+}
+
 function createBoard(rows, cols, minesCount) {
     const board = [];
 
@@ -40,26 +72,6 @@ function createBoard(rows, cols, minesCount) {
         }
     }
 
-    const directions = [
-        [-1, -1], [-1, 0], [-1, 1],
-        [0, -1], [0, 1],
-        [1, -1], [1, 0], [1, 1],
-    ];
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            if (board[row][col].hasMine) continue;
-
-            let count = 0;
-            for (const [directionRow, directionCol] of directions) {
-                const neighborRow = row + directionRow;
-                const neighborCol = col + directionCol;
-
-                if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols) {
-                    if (board[neighborRow][neighborCol].hasMine) count++;
-                }
-            }
-            board[row][col].adjacentMines = count;
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             if (board[row][col].hasMine) continue;
@@ -83,6 +95,7 @@ function openCell(game, row, col) {
     {
         const rows = game.board.length;
         const cols = game.board[0].length;
+
         for (const [dirRow, dirCol] of directions) {
             const neighborRow = row + dirRow;
             const neighborCol = col + dirCol;
@@ -104,6 +117,33 @@ function createGame(rows, cols, minesCount) {
     };
 }
 
-const testGame = createGame(5, 5, 5);
+function toggleFlag(game, row, col) {
+    if(game.board[row][col].state !== CellState.CLOSED) return;
+    game.board[row][col].state = CellState.FLAGGED;
+}
 
+function startTimer() {
+    let timerHandler = null;
+    let timer = 0;
+    timerHandler = setInterval(() => {
+        console.log(timer);
+        timer++;
+    }, 1000);
+    return timerHandler;
+}
+
+function stopTimer(timerHandler) {
+    console.log("Timer stopped");
+    clearInterval(timerHandler);
+}
+
+const testGame = createGame(5, 5, 5);
+openCell(testGame, 0, 0);
 console.log(testGame);
+openCell(testGame, 1, 2);
+toggleFlag(testGame, 2, 2);
+console.log(testGame);
+const timerHandler = startTimer();
+setTimeout(() => {
+    stopTimer(timerHandler);
+}, 1000);
