@@ -21,9 +21,9 @@ function createCell(hasMine = false, adjacentMines = 0, state = CellState.CLOSED
 function createBoard(rows, cols, minesCount) {
     const board = [];
 
-    for (let r = 0; r < rows; r++) {
+    for (let row = 0; row < rows; row++) {
         const row = [];
-        for (let c = 0; c < cols; c++) {
+        for (let col = 0; col < cols; col++) {
             row.push(createCell());
         }
         board.push(row);
@@ -40,42 +40,37 @@ function createBoard(rows, cols, minesCount) {
         }
     }
 
-<<<<<<< Updated upstream
     const directions = [
         [-1, -1], [-1, 0], [-1, 1],
         [0, -1], [0, 1],
         [1, -1], [1, 0], [1, 1],
     ];
 
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (board[r][c].hasMine) continue;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (board[row][col].hasMine) continue;
 
             let count = 0;
-            for (const [dr, dc] of directions) {
-                const nr = r + dr;
-                const nc = c + dc;
+            for (const [directionRow, directionCol] of directions) {
+                const neighborRow = row + directionRow;
+                const neighborCol = col + directionCol;
 
-                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                    if (board[nr][nc].hasMine) count++;
+                if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols) {
+                    if (board[neighborRow][neighborCol].hasMine) count++;
                 }
             }
-            board[r][c].adjacentMines = count;
-=======
+            board[row][col].adjacentMines = count;
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             if (board[row][col].hasMine) continue;
 
             board[row][col].adjacentMines = countAdjacentMines(board, row, col);
->>>>>>> Stashed changes
         }
     }
 
     return board;
 }
 
-<<<<<<< Updated upstream
-=======
 function openCell(game, row, col) {
     if(game.board[row][col].state !== CellState.CLOSED) return;
     game.board[row][col].state = CellState.OPENED;
@@ -99,7 +94,6 @@ function openCell(game, row, col) {
     }
 }
 
->>>>>>> Stashed changes
 function createGame(rows, cols, minesCount) {
     return {
         rows,
