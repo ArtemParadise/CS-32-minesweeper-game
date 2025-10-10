@@ -275,20 +275,20 @@ footer {
     .container {
         padding: 10px;
     }
-    
+
     header h1 {
         font-size: 2rem;
     }
-    
+
     .game-controls {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .custom-settings {
         justify-content: center;
     }
-    
+
     .cell {
         width: 25px;
         height: 25px;
@@ -304,7 +304,7 @@ footer {
         line-height: 18px;
         font-size: 10px;
     }
-    
+
     .game-board {
         padding: 10px;
     }
