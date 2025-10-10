@@ -53,9 +53,9 @@ function countAdjacentMines(board, row, col) {
 function createBoard(rows, cols, minesCount) {
     const board = [];
 
-    for (let r = 0; r < rows; r++) {
+    for (let row = 0; row < rows; row++) {
         const row = [];
-        for (let c = 0; c < cols; c++) {
+        for (let col = 0; col < cols; col++) {
             row.push(createCell());
         }
         board.push(row);
@@ -63,20 +63,20 @@ function createBoard(rows, cols, minesCount) {
 
     let placedMines = 0;
     while (placedMines < minesCount) {
-        const r = Math.floor(Math.random() * rows);
-        const c = Math.floor(Math.random() * cols);
+        const randomRow = Math.floor(Math.random() * rows);
+        const randomCol = Math.floor(Math.random() * cols);
 
-        if (!board[r][c].hasMine) {
-            board[r][c].hasMine = true;
+        if (!board[randomRow][randomCol].hasMine) {
+            board[randomRow][randomCol].hasMine = true;
             placedMines++;
         }
     }
 
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (board[r][c].hasMine) continue;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (board[row][col].hasMine) continue;
 
-            board[r][c].adjacentMines = countAdjacentMines(board, r, c);
+            board[row][col].adjacentMines = countAdjacentMines(board, row, col);
         }
     }
 
@@ -95,12 +95,13 @@ function openCell(game, row, col) {
     {
         const rows = game.board.length;
         const cols = game.board[0].length;
-        for (const [dr, dc] of directions) {
-            const nr = row + dr;
-            const nc = col + dc;
 
-            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                openCell(game, nr, nc);
+        for (const [dirRow, dirCol] of directions) {
+            const neighborRow = row + dirRow;
+            const neighborCol = col + dirCol;
+
+            if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols) {
+                openCell(game, neighborRow, neighborCol);
             }
         }
     }
