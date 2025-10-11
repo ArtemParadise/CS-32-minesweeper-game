@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minesweeper UI — Lavender</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Верхняя панель -->
+    <div class="bar card" role="toolbar" aria-label="Ігрова панель">
+      <div class="stat">
+        <span class="icon" aria-hidden="true">⏱</span>
+        <span class="stat__v" id="timer">000</span>
+      </div>
+
+      <button class="btn" id="new-game-btn" type="button" aria-label="Почати нову гру">Нова гра</button>
+
+      <div class="stat">
+        <span class="icon" aria-hidden="true">🚩</span>
+        <span class="stat__v" id="flags-left">010</span>
+      </div>
+    </div>
+
+    <!-- Поле -->
+    <section class="board card" aria-label="Ігрове поле Сапера">
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+
+    <!-- Легенда -->
+    <section class="legend card" aria-label="Опис клітинок">
+      <h3>Опис клітинок</h3>
+      <ul>
+        <li><b>Закрита клітинка</b> — ще не відкрита користувачем.</li>
+        <li><b>Відкрита порожня клітинка</b> — немає мін поруч.</li>
+        <li><b>Цифри (1–8)</b> — показують кількість мін навколо.</li>
+        <li><b>Прапорець 🚩</b> — позначка підозри на міну.</li>
+        <li><b>Міна 💣</b> — відображається після програшу.</li>
+        <li><b>Вибух 💥</b> — клітинка, на яку натиснули і підірвалися.</li>
+      </ul>
+    </section>
+
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
