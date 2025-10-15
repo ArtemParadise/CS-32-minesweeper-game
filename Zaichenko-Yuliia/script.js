@@ -29,11 +29,11 @@ function makeGameState(rows, cols, mines) {
 }
 
 /* ========= Утиліти для роботи з полем ========= */
-function inBounds(game, r, c) {
-  return r >= 0 && r < game.rows && c >= 0 && c < game.cols;
+function inBounds(game, row, col) {
+  return row>= 0 && row < game.rows && col >= 0 && col < game.cols;
 }
 
-const DIRS = [
+const DIRECTION_OFFSETS = [
   [-1, -1],
   [-1, 0],
   [-1, 1],
@@ -44,14 +44,14 @@ const DIRS = [
   [1, 1],
 ];
 
-function neighbors(game, r, c) {
-  const ns = [];
-  for (const [dr, dc] of DIRS) {
-    const nr = r + dr,
-      nc = c + dc;
-    if (inBounds(game, nr, nc)) ns.push([nr, nc]);
+function neighbors(game, row, col) {
+  const neighborCoordinates = [];
+  for (const [deltaRow, deltaCol] of DIRECTION_OFFSETS) {
+    const newRow = row + deltaRow,
+      newCol = col + deltaCol;
+    if (inBounds(game, newRow, newCol)) neighborCoordinates.push([newRow, newCol]);
   }
-  return ns;
+  return neighborCoordinates;
 }
 
 /* ========= Розстановка мін і підрахунок сусідів ========= */
@@ -61,25 +61,25 @@ function placeMinesRandomly(game) {
 
   const used = new Set();
   while (used.size < game.mines) {
-    const idx = Math.floor(Math.random() * total);
-    if (used.has(idx)) continue;
-    used.add(idx);
-    const r = Math.floor(idx / game.cols);
-    const c = idx % game.cols;
-    game.board[r][c].hasMine = true;
+    const randomIndex = Math.floor(Math.random() * total);
+    if (used.has(randomIndex)) continue;
+    used.add(randomIndex);
+    const row = Math.floor(randomIndex / game.cols);
+    const col = randomIndex % game.cols;
+    game.board[row][col].hasMine = true;
   }
 
-  for (let r = 0; r < game.rows; r++) {
-    for (let c = 0; c < game.cols; c++) {
-      if (game.board[r][c].hasMine) {
-        game.board[r][c].neighborMines = 0;
+  for (let row = 0; row < game.rows; row++) {
+    for (let col = 0; col < game.cols; col++) {
+      if (game.board[row][col].hasMine) {
+        game.board[row][col].neighborMines = 0;
         continue;
       }
-      let cnt = 0;
-      for (const [nr, nc] of neighbors(game, r, c)) {
-        if (game.board[nr][nc].hasMine) cnt++;
+      let neighborMineCount = 0;
+      for (const [newRow, newCol] of neighbors(game, row, col)) {
+        if (game.board[newRow][newCol].hasMine) neighborMineCount++;
       }
-      game.board[r][c].neighborMines = cnt;
+      game.board[row][col].neighborMines = neighborMineCount;
     }
   }
 }
@@ -130,8 +130,8 @@ console.log("=== Карта чисел (console.table) ===");
 console.table(boardToNumbers(game));
 
 /* ========= (Не обов’язково) Приклади змін стану ========= */
-function toggleFlag(game, r, c) {
-  const cell = game.board[r][c];
+function toggleFlag(game, row, col) {
+  const cell = game.board[row][col];
   if (cell.state === CellState.OPEN) return; 
   if (cell.state === CellState.FLAG) {
     cell.state = CellState.CLOSED;
@@ -142,8 +142,8 @@ function toggleFlag(game, r, c) {
   }
 }
 
-function openCell(game, r, c) {
-  const cell = game.board[r][c];
+function openCell(game, row, col) {
+  const cell = game.board[row][col];
   if (cell.state !== CellState.CLOSED) return;
   cell.state = CellState.OPEN;
 
@@ -153,12 +153,12 @@ function openCell(game, r, c) {
   }
   game.openedSafe++;
   if (cell.neighborMines === 0) {
-    for (const [nr, nc] of neighbors(game, r, c)) {
+    for (const [newRow, newCol] of neighbors(game, row, col)) {
       if (
-        game.board[nr][nc].state === CellState.CLOSED &&
-        !game.board[nr][nc].hasMine
+        game.board[newRow][newCol].state === CellState.CLOSED &&
+        !game.board[newRow][newCol].hasMine
       ) {
-        openCell(game, nr, nc);
+        openCell(game, newRow, newCol);
       }
     }
   }
