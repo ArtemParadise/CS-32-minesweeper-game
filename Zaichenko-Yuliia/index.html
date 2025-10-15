@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minesweeper — Lavender UI (10x10 Demo)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="frame">
+    <div class="toolbar">
+      <div class="stat">⏱ 000</div>
+      <button class="btn">Нова гра</button>
+      <div class="stat">🚩 015</div>
+    </div>
+    <div class="grid">
+      <!-- Поле 10x10 заповнене випадковими клітинками -->
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell flag"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell mine"></div>
+      <div class="cell open"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell"></div>
+      <div class="cell open n5">5</div>
+
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell open n6">6</div>
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+
+      <div class="cell open"></div>
+      <div class="cell flag"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell open n7">7</div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open n8">8</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell flag"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n5">5</div>
+
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n6">6</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n3">3</div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+      <div class="cell open n4">4</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell flag"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell open n2">2</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell mine"></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell open"></div>
+      <div class="cell"></div>
+      <div class="cell open n1">1</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell exploded">💥</div>
+    </div>
+
+    <div class="legend">
+      <h3>Опис клітинок</h3>
+      <ul>
+        <li><b>Закрита клітинка</b> — ще не відкрита користувачем.</li>
+        <li><b>Відкрита порожня клітинка</b> — немає мін поруч.</li>
+        <li><b>Цифри (1–8)</b> — показують кількість мін навколо.</li>
+        <li><b>Прапорець 🚩</b> — користувач позначив підозру на міну.</li>
+        <li><b>Міна 💣</b> — відображається після програшу.</li>
+        <li><b>Вибух 💥</b> — клітинка, на яку користувач натиснув і підрився на міні.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
