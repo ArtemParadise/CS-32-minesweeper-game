@@ -1,16 +1,34 @@
-"use strict";
+// ===== СТАТИКА
+const CellState = { CLOSED:"closed", OPEN:"open", FLAG:"flag", MINE:"mine", EXPLODED:"exploded" };
+const GameStatus = { READY:"ready", RUNNING:"running", WIN:"win", LOSE:"lose" };
+const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 
-/* ========= Константи станів ========= */
-const CellState = { CLOSED: "closed", OPEN: "open", FLAG: "flag" };
-const GameStatus = { RUNNING: "running", WIN: "win", LOSE: "lose" };
+// ===== ГЛОБАЛЬНЫЙ СТЕЙТ
+let rows=10, cols=10, minesCount=10;
+let field=[];
+let gameStatus=GameStatus.READY;
+let flagsPlaced=0;
+let firstClick=false;
 
-/* ========= Модель клітинки ========= */
-function makeCell(hasMine = false) {
-  return {
-    hasMine, // булеве
-    neighborMines: 0, // кількість мін навколо (0..8)
-    state: CellState.CLOSED, // closed | open | flag
-  };
+// ===== ТАЙМЕР
+let timerId=null, seconds=0;
+const elTimer = document.getElementById("timer");
+const elFlags = document.getElementById("flags-left");
+function resetTimer(){ clearInterval(timerId); timerId=null; seconds=0; elTimer.textContent="000"; }
+function startTimer(){ if (timerId) return; timerId=setInterval(()=>{ seconds++; elTimer.textContent=String(seconds).padStart(3,"0"); },1000); }
+function stopTimer(){ clearInterval(timerId); timerId=null; }
+
+// ===== DOM
+const gridEl = document.getElementById("grid");
+document.addEventListener("contextmenu", e => e.preventDefault()); // блок контекстного меню ПКМ
+
+// ===== УТИЛЫ
+const inBounds = (r,c)=> r>=0 && c>=0 && r<rows && c<cols;
+const makeCell = ()=>({ hasMine:false, neighborMines:0, state:CellState.CLOSED });
+
+// ===== ГЕНЕРАЦИЯ
+function generateEmpty(){
+  field = Array.from({length:rows}, ()=> Array.from({length:cols}, makeCell));
 }
 
 /* ========= Модель стану гри ========= */
@@ -84,38 +102,37 @@ function placeMinesRandomly(game) {
   }
 }
 
-/* ========= Допоміжний вивід у консоль ========= */
-function boardToMineMap(game) {
-  return game.board.map((row) =>
-    row.map((cell) => (cell.hasMine ? "💣" : "."))
-  );
-}
+// ===== РЕНДЕР
+function render(){
+  gridEl.innerHTML = "";
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
 
-function boardToNumbers(game) {
-  return game.board.map((row) =>
-    row.map((cell) => (cell.hasMine ? "X" : String(cell.neighborMines)))
-  );
-}
+  for (let r=0;r<rows;r++){
+    for (let c=0;c<cols;c++){
+      const cell = field[r][c];
+      const btn = document.createElement("button");
+      btn.className = "cell";
+      // классы состояния
+      btn.classList.toggle("open", cell.state===CellState.OPEN);
+      btn.classList.toggle("flag", cell.state===CellState.FLAG);
+      btn.classList.toggle("mine", cell.state===CellState.MINE);
+      btn.classList.toggle("exploded", cell.state===CellState.EXPLODED);
 
-function printBoardPretty(grid, title) {
-  console.log(title);
-  const asStrings = grid.map((row) => row.join(" "));
-  console.log(asStrings.join("\n"));
-}
+      // цифра
+      btn.textContent = "";
+      if (cell.state === CellState.OPEN && cell.neighborMines>0){
+        btn.textContent = String(cell.neighborMines);
+        btn.classList.add(`n${cell.neighborMines}`);
+      }
 
-/* ========= Демо-ініціалізація (10×10, 15 мін) ========= */
-const game = makeGameState(10, 10, 15);
-placeMinesRandomly(game);
+      // иконки через текст (дублируем к ::after на всякий)
+      if (cell.state === CellState.FLAG){ btn.textContent = "🚩"; }
+      if (cell.state === CellState.MINE){ btn.textContent = "💣"; }
+      if (cell.state === CellState.EXPLODED){ btn.textContent = "💥"; }
 
-/* ========= Вивід, який вимагає завдання ========= */
-console.log("=== Стан гри (метадані) ===");
-console.log({
-  rows: game.rows,
-  cols: game.cols,
-  mines: game.mines,
-  status: game.status,
-  flagsLeft: game.flagsLeft,
-});
+      btn.addEventListener("click", () => onLeft(r,c));
+      btn.addEventListener("mousedown", (e)=>{ if (e.button===2) onRight(r,c); });
+
 
 console.log("=== Приклад структури клітинки [0][0] ===");
 console.log(game.board[0][0]); 
@@ -140,17 +157,32 @@ function toggleFlag(game, row, col) {
     cell.state = CellState.FLAG;
     game.flagsLeft--;
   }
+  elFlags.textContent = String(minesCount - flagsPlaced).padStart(3,"0");
 }
+
 
 function openCell(game, row, col) {
   const cell = game.board[row][col];
   if (cell.state !== CellState.CLOSED) return;
   cell.state = CellState.OPEN;
 
-  if (cell.hasMine) {
-    game.status = GameStatus.LOSE;
+
+  if (!firstClick){
+    placeMinesSafe(r,c);
+    firstClick = true;
+    gameStatus = GameStatus.RUNNING;
+    startTimer();
+  }
+
+  if (cell.hasMine){
+    cell.state = CellState.EXPLODED;
+    revealMines();
+    gameStatus = GameStatus.LOSE;
+    stopTimer();
+    render();
     return;
   }
+
   game.openedSafe++;
   if (cell.neighborMines === 0) {
     for (const [newRow, newCol] of neighbors(game, row, col)) {
@@ -159,17 +191,44 @@ function openCell(game, row, col) {
         !game.board[newRow][newCol].hasMine
       ) {
         openCell(game, newRow, newCol);
+
       }
     }
   }
-  const totalSafe = game.rows * game.cols - game.mines;
-  if (game.openedSafe === totalSafe) game.status = GameStatus.WIN;
 }
-toggleFlag(game, 0, 0);
-openCell(game, 5, 5);
-console.log("=== Після декількох дій ===");
-console.log({
-  status: game.status,
-  flagsLeft: game.flagsLeft,
-  openedSafe: game.openedSafe,
-});
+
+function revealMines(){
+  for (let r=0;r<rows;r++){
+    for (let c=0;c<cols;c++){
+      const cell=field[r][c];
+      if (cell.hasMine && cell.state!==CellState.EXPLODED){
+        cell.state = CellState.MINE;
+      }
+    }
+  }
+}
+
+function checkWin(){
+  for (let r=0;r<rows;r++){
+    for (let c=0;c<cols;c++){
+      const cell=field[r][c];
+      if (!cell.hasMine && cell.state!==CellState.OPEN) return false;
+    }
+  }
+  return true;
+}
+
+// ===== НОВАЯ ИГРА
+function newGame(r=10,c=10,m=10){
+  rows=r; cols=c; minesCount=m;
+  resetTimer();
+  firstClick=false;
+  flagsPlaced=0;
+  gameStatus=GameStatus.READY;
+  generateEmpty();
+  render();
+}
+document.getElementById("new-game-btn").addEventListener("click", ()=> newGame(10,10,10));
+
+// старт
+newGame(10,10,10);
