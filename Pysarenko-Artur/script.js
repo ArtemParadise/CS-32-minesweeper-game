@@ -71,13 +71,53 @@ function countNeighbourMines(field, row, col) {
   return count;
 }
 
+
+function checkWin(game) {
+  let opened = 0;
+  const totalCells = game.rows * game.cols;
+  const safeCells = totalCells - game.minesCount;
+
+  for (let r = 0; r < game.rows; r++) {
+    for (let c = 0; c < game.cols; c++) {
+      if (game.field[r][c].state === "open" && !game.field[r][c].hasMine) {
+        opened++;
+      }
+    }
+  }
+
+  if (opened === safeCells) {
+    game.status = "win";
+    stopTimer();
+    setTimeout(() => {
+      console.log("🏆 ВИГРАШ! Усі безпечні клітинки відкрито!");
+      alert("Ти виграв. Всі безпечні клітинки відкрито. Для нової гри нажми кнопку PLAY.");
+  }, 50); // 50 мс зазвичай достатньо
+  }
+}
+
 function openCell(game, row, col) {
+  if (timerId === null) startTimer();
   const cell = game.field[row][col];
   if (cell.state !== "closed" || game.status !== "in_progress") return;
   if (cell.hasMine) {
     cell.state = "open";
     game.status = "lose";
-    console.log("💥 Гравець програв!");
+    stopTimer(); // зупиняємо таймер після програшу
+    // 🔹 Відкрити всі міни
+    for (let r = 0; r < game.rows; r++) {
+      for (let c = 0; c < game.cols; c++) {
+        const currentCell = game.field[r][c];
+        if (currentCell.hasMine) {
+          currentCell.state = "open";
+        }
+      }
+    }
+    
+    setTimeout(() => {
+      console.log("💥 Гравець програв!");
+      alert("Ти програв. Для нової гри нажми кнопку PLAY.");
+    }, 50);
+
     return;
   }
   cell.state = "open";
@@ -93,7 +133,13 @@ function openCell(game, row, col) {
       }
     }
   }
+  // 🔹 Перевірка на виграш після відкриття клітинки
+  if (checkWin(game)) {
+    game.status = "win";
+    stopTimer();
+  }
 }
+
 
 function toggleFlag(game, row, col) {
   const cell = game.field[row][col];
@@ -108,15 +154,168 @@ function toggleFlag(game, row, col) {
 
 }
 
+
+
+
+
+
+// === ФУНКЦІЯ РЕНДЕРИНГУ ІГРОВОГО ПОЛЯ ===
+function renderGameField(game) {
+  const grid = document.querySelector('.grid');
+  if (!grid || !game) return;
+
+  // Очищуємо попереднє поле
+  grid.innerHTML = '';
+  
+  // Проходимо по всіх клітинках ігрового поля
+  for (let r = 0; r < game.rows; r++) {
+    for (let c = 0; c < game.cols; c++) {
+      // Створюємо HTML елемент клітинки
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      
+      // Отримуємо дані клітинки з ігрового стану
+      const gameCell = game.field[r][c];
+      
+      // Визначаємо стан клітинки та додаємо відповідні класи
+      if (gameCell.state === "open") {
+        cell.classList.add('open');
+        if (gameCell.hasMine) {
+          // Якщо це міна - показуємо символ міни
+          cell.classList.add('mine');
+          cell.innerHTML = '💣';
+        } else if (gameCell.adjacentMines > 0) {
+          // Якщо є сусідні міни - показуємо їх кількість
+          cell.classList.add(`num-${gameCell.adjacentMines}`);
+          cell.textContent = gameCell.adjacentMines;
+        }
+      } else if (gameCell.state === "flagged") {
+        // Якщо клітинка позначена прапорцем
+        cell.classList.add('flag');
+        cell.innerHTML = '🚩';
+      } else {
+        // Якщо клітинка закрита
+        cell.classList.add('closed');
+      }
+      
+      // Додаємо клітинку до сітки
+      grid.appendChild(cell);
+    }
+  }
+}
+
+
+// === ГЛОБАЛЬНА ЗМІННА ГРИ ===
+let game = null;
+
+// === ФУНКЦІЯ ДЛЯ ПОЧАТКУ НОВОЇ ГРИ ===
+function startNewGame() {
+  game = createGameState(9, 9, 5);        // створюємо ігровий стан
+  game.field = generateField(game.rows, game.cols, game.minesCount); // генеруємо поле
+  // Обнуляємо лічильник прапорців
+  flagsLeft = game.minesCount;
+  updateFlagsCount();
+  renderGameField(game);               // рендеримо поле
+
+  stopTimer();
+
+  // Обнуляємо таймер на панелі
+  const timerElement = document.getElementById('timer');
+  if (timerElement) timerElement.textContent = String(0).padStart(3, '0');
+
+  console.log("🎮 Нова гра розпочата!");
+  console.log("Стан гри:", game);
+}
+
+// === СТАРТ ГРИ ПО КНОПЦІ PLAY ===
+document.addEventListener('DOMContentLoaded', function() {
+  // Знаходимо кнопку за класом (не за ID!)
+  const playButton = document.querySelector('.play-btn');
+  
+  if (playButton) {
+    playButton.addEventListener("click", startNewGame);
+  }
+
+  // === ОБРОБКА КЛІКІВ ===
+  
+  // Лівий клік (відкрити клітинку)
+  document.querySelector('.grid').addEventListener('click', (e) => {
+    const cell = e.target;
+    if (!cell.classList.contains('cell') || !game) return;
+
+    // Якщо гра вже завершена — не реагуємо
+  if (game.status !== "in_progress") return;
+
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+
+    openCell(game, row, col); // відкриваємо клітинку
+    renderGameField(game);    // перемальовуємо після змін
+  });
+
+  // Правий клік (поставити/зняти прапорець)
+  document.querySelector('.grid').addEventListener('contextmenu', (e) => {
+    e.preventDefault(); // відміняємо стандартне контекстне меню
+
+    const cell = e.target;
+    if (!cell.classList.contains('cell') || !game) return;
+
+    // Блокуємо, якщо гра завершена
+  if (game.status !== "in_progress") return;
+
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+
+    toggleFlag(game, row, col); // ставимо або знімаємо прапорець
+    renderGameField(game);      // перемальовуємо після змін
+  });
+});
+
+let flagsLeft = 5; //  кількість мін на полі
+
+function updateFlagsCount() {
+  const flagsElement = document.getElementById('flags-count');
+  if (flagsElement) {
+    // Виводимо три цифри з ведучими нулями
+    flagsElement.textContent = String(flagsLeft).padStart(3, '0');
+  }
+}
+
+function toggleFlag(game, row, col) {
+  const cell = game.field[row][col];
+
+  if (cell.state === "closed" && flagsLeft > 0) {
+    cell.state = "flagged";
+    flagsLeft--;
+  } else if (cell.state === "flagged") {
+    cell.state = "closed";
+    flagsLeft++;
+  }
+
+  updateFlagsCount(); // оновлюємо лічильник прапорців
+  console.log(
+    `toggleFlag: cell [${row},${col}] now is "${cell.state}", flagsLeft=${flagsLeft}`
+  );
+}
+
+
 let timerId = null;
 let seconds = 0;
 
 function startTimer() {
   if (timerId !== null) return;
   seconds = 0;
+
   timerId = setInterval(() => {
     seconds++;
     console.log("⏱️", seconds, "сек");
+
+    const timerElement = document.getElementById('timer'); // беремо елемент всередині інтервалу
+    if (timerElement) {
+      timerElement.textContent = String(seconds).padStart(3, '0');
+    }
   }, 1000);
 }
 
@@ -125,28 +324,3 @@ function stopTimer() {
   timerId = null;
   console.log("⏹️ Таймер зупинено на", seconds, "сек");
 }
-
-const game = createGameState(9, 9, 9);
-game.field = generateField(game.rows, game.cols, game.minesCount);
-
-console.log("Поле з випадковими мінами:");
-console.log(game.field);
-
-startTimer();
-openCell(game, 0, 0);
-openCell(game, 0, 3);
-openCell(game, 4, 0);
-openCell(game, 1, 0);
-openCell(game, 1, 1);
-openCell(game, 1, 2);
-openCell(game, 1, 3);
-openCell(game, 1, 4);
-openCell(game, 1, 5);
-openCell(game, 1, 6);
-openCell(game, 1, 7);
-openCell(game, 1, 8);
-console.log(game);
-console.log(countNeighbourMines(game.field, 3, 0));
-toggleFlag(game, 1, 1);
-console.log(game.field[1][1]);
-stopTimer();

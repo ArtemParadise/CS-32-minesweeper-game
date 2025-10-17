@@ -12,28 +12,16 @@
   <div class="game-container">
     <!-- Верхня панель -->
     <div class="top-panel">
-      <div class="indicator">010</div>
-      <div class="indicator">000</div>
+      <div class="indicator"> <span id="flags-count">005</span></div>
+      <div class="indicator"> <span id="timer">000</span></div>
     </div>
-
     <!-- Поле гри -->
-    <div class="grid">
-      <div class="cell open"></div>
-      <div class="cell closed"></div>
-      <div class="cell open num-1">1</div>
-      <div class="cell flag mine">
-        <span class="mine-icon">💣</span>
-        <span class="flag-icon">🚩</span></div>
-      <div class="cell flag">🚩</div>
-      <div class="cell mine">💣</div>
-      <div class="cell hit">💥</div>
-      <div class="cell open num-2">2</div>
-      <div class="cell open num-3">3</div>
-      
+    <div class="grid" id="game-board"></div>
+    
     </div>
   </div>
   
-  <button class="play-btn">PLAY</button>
+  <button id="play-btn" class="play-btn">PLAY</button>
   <script src="script.js"></script>
 </body>
 </html>
