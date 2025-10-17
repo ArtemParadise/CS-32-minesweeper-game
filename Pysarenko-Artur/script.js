@@ -58,13 +58,13 @@ function countNeighbourMines(field, row, col) {
   const rows = field.length;
   const cols = field[0].length;
   let count = 0;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      if (dr === 0 && dc === 0) continue;
-      const nr = row + dr;
-      const nc = col + dc;
-      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-        if (field[nr][nc].hasMine) count++;
+  for (let directionRow = -1; directionRow <= 1; directionRow++) {
+    for (let directionCol = -1; directionCol <= 1; directionCol++) {
+      if (directionRow === 0 && directionCol === 0) continue;
+      const neighbourRow = row + directionRow;
+      const neighbourCol = col + directionCol;
+      if (neighbourRow >= 0 && neighbourRow < rows && neighbourCol >= 0 && neighbourCol < cols) {
+        if (field[neighbourRow][neighbourCol].hasMine) count++;
       }
     }
   }
@@ -122,13 +122,13 @@ function openCell(game, row, col) {
   }
   cell.state = "open";
   if (cell.adjacentMines === 0) {
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const nr = row + dr;
-        const nc = col + dc;
-        if (nr >= 0 && nr < game.rows && nc >= 0 && nc < game.cols) {
-          openCell(game, nr, nc);
+    for (let directionRow = -1; directionRow <= 1; directionRow++) {
+      for (let directionCol = -1; directionCol <= 1; directionCol++) {
+        if (directionRow === 0 && directionCol === 0) continue;
+        const neighbourRow = row + directionRow;
+        const neighbourCol = col + directionCol;
+        if (neighbourRow >= 0 && neighbourRow < game.rows && neighbourCol >= 0 && neighbourCol < game.cols) {
+          openCell(game, neighbourRow, neighbourCol);
         }
       }
     }
