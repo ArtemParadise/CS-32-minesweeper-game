@@ -8,114 +8,15 @@
 </head>
 <body>
 <div class="game-container">
-  <!-- Хедер з елементами управління -->
   <header class="game-header">
-    <div class="mines-counter">004</div>
-    <button class="restart-button">🙁</button>
-    <div class="timer">004</div>
+    <div class="mines-counter" id="minesCounter">000</div>
+    <button class="restart-button" id="restartBtn" title="Почати знову">🙂</button>
+    <div class="timer" id="timer">000</div>
   </header>
 
-  <!-- Ігрове поле -->
-  <div class="game-board">
-    <!-- Рядок 1 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num2">2</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 2 -->
-    <div class="cell opened num2">2</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 3 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 4 -->
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 5 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell mine">💣</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell flagged">🚩</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 6 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 7 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num2">2</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num2">2</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 8 -->
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell opened num2">2</div>
-    <div class="cell mine-triggered">💥</div>
-    <div class="cell opened num1">1</div>
-    <div class="cell flagged-wrong">🚩</div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-
-    <!-- Рядок 9 -->
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-    <div class="cell closed"></div>
-  </div>
+  <div class="game-board" id="board" aria-label="Minesweeper board" role="grid"></div>
 </div>
+
+<script src="script.js"></script>
 </body>
 </html>

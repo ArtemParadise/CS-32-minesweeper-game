@@ -44,88 +44,44 @@ body {
     cursor: pointer;
 }
 
-.restart-button:hover {
-    background-color: #d0d0d0;
-}
+.restart-button:hover { background-color: #d0d0d0; }
 
 .game-board {
-    display: grid;
-    grid-template-columns: repeat(9, 20px);
-    grid-gap: 0;
-    background-color: #c0c0c0;
-    border: 2px inset #808080;
+  display: grid;
+  grid-template-columns: repeat(9, 24px);
+  grid-auto-rows: 24px;
+  gap: 0;
+  background-color: #c0c0c0;
+  border: 2px inset #808080;
 }
 
 .cell {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    font-weight: bold;
-    border: 3px outset #fff;
-    background-color: #c0c0c0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+  cursor: pointer;
 }
+.cell.closed { border: 3px outset #fff; background: #c0c0c0; }
+.cell.opened { background: #c0c0c0; border: 1px solid #808080; cursor: default; }
 
-.closed {
-    border: 3px outset #fff;
-}
+.cell.flagged { background: #c0c0c0; }
+.cell.flagged::after { content: "🚩"; }
 
-.opened {
-    background-color: #c0c0c0;
-    border: 1px solid #808080;
-}
+.cell.mine.revealed { background: #c0c0c0; }
+.cell.mine-triggered { background: #f00; }
+.cell.mine::after { content: "💣"; }
 
-.num1 {
-    color: #00f;
-}
-
-.num2 {
-    color: #008000;
-}
-
-.num3 {
-    color: #f00;
-}
-
-.num4 {
-    color: #000080;
-}
-
-.num5 {
-    color: #800000;
-}
-
-.num6 {
-    color: #008080;
-}
-
-.num7 {
-    color: #000;
-}
-
-.num8 {
-    color: #808080;
-}
-
-.flagged {
-    content: '🚩';
-    color: #f00;
-}
-
-.flagged-wrong {
-    content: '🚩';
-    color: #f00;
-    background-color: #ffb3b3;
-}
-
-.mine {
-    background-color: #c0c0c0;
-    color: #000;
-}
-
-.mine-triggered {
-    background-color: #f00;
-    color: #000;
-}
+/* Кольори чисел */
+.cell.num1 { color: #00f; }
+.cell.num2 { color: #008000; }
+.cell.num3 { color: #f00; }
+.cell.num4 { color: #000080; }
+.cell.num5 { color: #800000; }
+.cell.num6 { color: #008080; }
+.cell.num7 { color: #000; }
+.cell.num8 { color: #808080; }
