@@ -1,0 +1,131 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.game-container {
+    background-color: #c0c0c0;
+    padding: 10px;
+    border: 3px outset #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    background-color: #c0c0c0;
+    border: 2px inset #808080;
+}
+
+.mines-counter, .timer {
+    background-color: #000;
+    color: #f00;
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    padding: 2px 6px;
+    border: 2px inset #808080;
+    width: 60px;
+    text-align: center;
+}
+
+.restart-button {
+    background-color: #c0c0c0;
+    border: 2px outset #fff;
+    font-size: 24px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.restart-button:hover {
+    background-color: #d0d0d0;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(9, 20px);
+    grid-gap: 0;
+    background-color: #c0c0c0;
+    border: 2px inset #808080;
+}
+
+.cell {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 3px outset #fff;
+    background-color: #c0c0c0;
+}
+
+.closed {
+    border: 3px outset #fff;
+}
+
+.opened {
+    background-color: #c0c0c0;
+    border: 1px solid #808080;
+}
+
+.num1 {
+    color: #00f;
+}
+
+.num2 {
+    color: #008000;
+}
+
+.num3 {
+    color: #f00;
+}
+
+.num4 {
+    color: #000080;
+}
+
+.num5 {
+    color: #800000;
+}
+
+.num6 {
+    color: #008080;
+}
+
+.num7 {
+    color: #000;
+}
+
+.num8 {
+    color: #808080;
+}
+
+.flagged {
+    content: '🚩';
+    color: #f00;
+}
+
+.flagged-wrong {
+    content: '🚩';
+    color: #f00;
+    background-color: #ffb3b3;
+}
+
+.mine {
+    background-color: #c0c0c0;
+    color: #000;
+}
+
+.mine-triggered {
+    background-color: #f00;
+    color: #000;
+}
