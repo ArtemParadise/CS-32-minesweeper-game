@@ -166,3 +166,20 @@ body {
     z-index: 2;
 }
 
+.notification {
+    margin: 0;
+    flex: 0 1 120px;
+    text-align: center;
+    overflow: hidden;
+    word-wrap: break-word;
+    font-size: 20px;
+}
+
+.success{
+    color:#00ff00;
+}
+
+.error{
+    color:#ff3300
+}
+

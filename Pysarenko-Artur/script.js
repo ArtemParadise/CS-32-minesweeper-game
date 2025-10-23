@@ -90,7 +90,7 @@ function checkWin(game) {
     stopTimer();
     setTimeout(() => {
       console.log("🏆 ВИГРАШ! Усі безпечні клітинки відкрито!");
-      alert("Ти виграв. Всі безпечні клітинки відкрито. Для нової гри нажми кнопку PLAY.");
+      showSuccessMessage("Виграш");
   }, 50); // 50 мс зазвичай достатньо
   }
 }
@@ -115,7 +115,7 @@ function openCell(game, row, col) {
     
     setTimeout(() => {
       console.log("💥 Гравець програв!");
-      alert("Ти програв. Для нової гри нажми кнопку PLAY.");
+      showErrorMessage("Програш");
     }, 50);
 
     return;
@@ -220,6 +220,7 @@ function startNewGame() {
   renderGameField(game);               // рендеримо поле
 
   stopTimer();
+  clearMessage();
 
   // Обнуляємо таймер на панелі
   const timerElement = document.getElementById('timer');
@@ -323,4 +324,28 @@ function stopTimer() {
   clearInterval(timerId);
   timerId = null;
   console.log("⏹️ Таймер зупинено на", seconds, "сек");
+}
+
+function showErrorMessage(message) {
+  const notification = document.querySelector('.notification');
+  if (!notification) return;
+  
+  notification.textContent = message;
+  notification.className = 'notification error';
+}
+
+function showSuccessMessage(message) {
+  const notification = document.querySelector('.notification');
+  if (!notification) return;
+
+  notification.textContent = message;
+  notification.className = 'notification success';
+}
+
+function clearMessage() {
+  const notification = document.querySelector('.notification');
+  if (!notification) return;
+
+  notification.textContent = '';
+  notification.className = 'notification';
 }
