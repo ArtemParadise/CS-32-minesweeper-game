@@ -95,23 +95,26 @@ function checkWin(game) {
   }
 }
 
+function revealMines(game) {
+  for (let r = 0; r < game.rows; r++) {
+    for (let c = 0; c < game.cols; c++) {
+      const currentCell = game.field[r][c];
+      if (currentCell.hasMine && currentCell.state !== "exploded") {
+        currentCell.state = "open";
+      }
+    }
+  }
+}
 function openCell(game, row, col) {
   if (timerId === null) startTimer();
   const cell = game.field[row][col];
   if (cell.state !== "closed" || game.status !== "in_progress") return;
   if (cell.hasMine) {
-    cell.state = "open";
+    cell.state = "exploded";
     game.status = "lose";
     stopTimer(); // зупиняємо таймер після програшу
     // 🔹 Відкрити всі міни
-    for (let r = 0; r < game.rows; r++) {
-      for (let c = 0; c < game.cols; c++) {
-        const currentCell = game.field[r][c];
-        if (currentCell.hasMine) {
-          currentCell.state = "open";
-        }
-      }
-    }
+    revealMines(game);
     
     setTimeout(() => {
       console.log("💥 Гравець програв!");
@@ -178,7 +181,6 @@ function renderGameField(game) {
       
       // Отримуємо дані клітинки з ігрового стану
       const gameCell = game.field[r][c];
-      
       // Визначаємо стан клітинки та додаємо відповідні класи
       if (gameCell.state === "open") {
         cell.classList.add('open');
@@ -191,6 +193,10 @@ function renderGameField(game) {
           cell.classList.add(`num-${gameCell.adjacentMines}`);
           cell.textContent = gameCell.adjacentMines;
         }
+      } else if (gameCell.state === "exploded") {
+        // Якщо клітинка вибухнула
+        cell.classList.add('mine', 'exploded');
+        cell.innerHTML = '💥'
       } else if (gameCell.state === "flagged") {
         // Якщо клітинка позначена прапорцем
         cell.classList.add('flag');
