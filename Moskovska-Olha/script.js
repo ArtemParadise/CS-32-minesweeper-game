@@ -24,6 +24,10 @@ const directions = [
     [1, -1], [1, 0], [1, 1],
 ];
 
+document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+});
+
 function getAdjacentCells(board, row, col) {
     const cells = [];
     const rows = board.length;
@@ -86,11 +90,7 @@ function createBoard(rows, cols, minesCount) {
 function openCell(game, row, col) {
     if(game.board[row][col].state !== CellState.CLOSED) return;
     game.board[row][col].state = CellState.OPENED;
-    if(game.board[row][col].hasMine)
-    {
-        game.state = GameState.LOST;
-        return;
-    }
+
     if(game.board[row][col].adjacentMines === 0)
     {
         const rows = game.board.length;
@@ -105,6 +105,7 @@ function openCell(game, row, col) {
             }
         }
     }
+    checkGameState(game);
 }
 
 function createGame(rows, cols, minesCount) {
@@ -116,17 +117,31 @@ function createGame(rows, cols, minesCount) {
         board: createBoard(rows, cols, minesCount),
     };
 }
+const counterElement = document.querySelector('.counter');
 
 function toggleFlag(game, row, col) {
     if(game.board[row][col].state !== CellState.CLOSED) return;
     game.board[row][col].state = CellState.FLAGGED;
+    const minesLeft = game.minesCount-1;
+    if(minesLeft < 0)
+    {
+        counterElement.textContent = "🤡";
+    }
+    else
+    {
+        counterElement.textContent = minesLeft;
+        game.minesCount = minesLeft;
+    }
+    checkGameState(game);
 }
 
+let timerHandler = null;
+const timerElement = document.querySelector('.timer');
+
 function startTimer() {
-    let timerHandler = null;
     let timer = 0;
     timerHandler = setInterval(() => {
-        console.log(timer);
+        timerElement.textContent = timer;
         timer++;
     }, 1000);
     return timerHandler;
@@ -137,13 +152,115 @@ function stopTimer(timerHandler) {
     clearInterval(timerHandler);
 }
 
-const testGame = createGame(5, 5, 5);
-openCell(testGame, 0, 0);
-console.log(testGame);
-openCell(testGame, 1, 2);
-toggleFlag(testGame, 2, 2);
-console.log(testGame);
-const timerHandler = startTimer();
-setTimeout(() => {
-    stopTimer(timerHandler);
-}, 1000);
+const boardElement = document.querySelector('.board');
+const newGameButton = document.querySelector('.new-game');
+let game = null;
+
+
+function renderBoard(game) {
+    boardElement.innerHTML = '';
+    boardElement.style.gridTemplateColumns = `repeat(${game.cols}, 1fr)`;
+
+    const board = game.board;
+    const rows = board.length;
+    const cols = board[0].length;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const cell = board[row][col];
+            const cellElement = document.createElement("div");
+            cellElement.classList.add("cell");
+            cellElement.dataset.row = row;
+            cellElement.dataset.col = col;
+            
+            switch (cell.state) {
+                case CellState.OPENED:
+                    cellElement.classList.add('open');
+                    if (cell.hasMine) {
+                        cellElement.classList.add('mine-hit');
+                        cellElement.textContent = '💥';
+                    } else if (cell.adjacentMines > 0) {
+                        cellElement.textContent = cell.adjacentMines;
+                        cellElement.classList.add(`n${cell.adjacentMines}`);
+                    }
+                    break;
+                case CellState.FLAGGED:
+                    cellElement.classList.add('flag');
+                    cellElement.textContent = '🚩';
+                    break;
+                case CellState.CLOSED:
+                    cellElement.classList.add('closed');
+                    break;
+            }
+
+            if (game.state === GameState.LOST && cell.hasMine && cell.state !== CellState.OPENED) {
+                cellElement.classList.remove('closed', 'flag');
+                cellElement.classList.add('mine');
+                cellElement.textContent = '💣';
+            }
+
+            boardElement.appendChild(cellElement);
+        }
+    }
+}
+
+function checkGameState(game) {
+    const board = game.board;
+    const rows = board.length;
+    const cols = board[0].length;
+    let hasUnflaggedMine = false;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const cell = board[row][col];
+            if (cell.state === CellState.OPENED && cell.hasMine) {
+                game.state = GameState.LOST;
+                counterElement.textContent = "💣Lost💣";
+                stopTimer(timerHandler);
+                return;
+            }
+            else if (cell.state !== CellState.FLAGGED && cell.hasMine) {
+                hasUnflaggedMine = true;
+            }
+        }
+    }
+    if (!hasUnflaggedMine && game.minesCount >= 0) {
+        counterElement.textContent = "✨Won✨";
+        game.state = GameState.WON;
+        stopTimer(timerHandler);
+        renderBoard(game);
+    }
+}
+
+
+function handleLeftClick(event) {
+    const cellElement = event.target.closest('.cell');
+    if (!cellElement) return;
+
+    const row = parseInt(cellElement.dataset.row);
+    const col = parseInt(cellElement.dataset.col);
+    openCell(game, row, col);
+    renderBoard(game);
+}
+
+function handleRightClick(event) {
+    const cellElement = event.target.closest('.cell');
+    if (!cellElement) return;
+
+    const row = parseInt(cellElement.dataset.row);
+    const col = parseInt(cellElement.dataset.col);
+    toggleFlag(game, row, col);
+    renderBoard(game);
+}
+
+function handleNewGame() {
+    if(timerHandler) stopTimer(timerHandler);
+    const initialMinesCount = 10;
+    counterElement.textContent = initialMinesCount;
+    game = createGame(16, 10, initialMinesCount);
+    renderBoard(game);
+    startTimer();
+}
+
+newGameButton.addEventListener('click', handleNewGame);
+boardElement.addEventListener('click', handleLeftClick);
+boardElement.addEventListener('contextmenu', handleRightClick);
+handleNewGame();
