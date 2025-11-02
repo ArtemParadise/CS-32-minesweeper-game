@@ -11,7 +11,6 @@ let timerId = null;    // ID для setInterval
 let time = 0;          // Лічильник часу гри в секундах
 
 // --- Отримання DOM-елементів з index.html ---
-// Ми прив'яжемо логіку до кнопок, щоб можна було почати гру
 const difficultySelect = document.getElementById('difficulty');
 const customSettings = document.getElementById('customSettings');
 const customWidthInput = document.getElementById('customWidth');
@@ -19,11 +18,14 @@ const customHeightInput = document.getElementById('customHeight');
 const customMinesInput = document.getElementById('customMines');
 const newGameBtn = document.getElementById('newGameBtn');
 
-// --- Ініціалізація гри ---
-// Цей код виконається, коли сторінка (DOM) завантажиться
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("DOM завантажено. Налаштування логіки гри.");
+// Нові DOM-елементи для завдань 2, 3, 4
+const gameBoard = document.getElementById('gameBoard');
+const minesCountEl = document.getElementById('minesCount');
+const timerEl = document.getElementById('timer');
+const gameStatusEl = document.getElementById('gameStatus');
 
+// --- Ініціалізація гри ---
+document.addEventListener('DOMContentLoaded', () => {
   // Додаємо обробники подій до елементів керування
   difficultySelect.addEventListener('change', handleDifficultyChange);
   newGameBtn.addEventListener('click', newGame);
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Обробляє зміну рівня складності, показуючи/ховаючи кастомні налаштування.
+ * Обробляє зміну рівня складності.
  */
 function handleDifficultyChange() {
   const level = difficultySelect.value;
@@ -61,7 +63,6 @@ function getGameSettings() {
       const c = parseInt(customWidthInput.value) || 16;
       let m = parseInt(customMinesInput.value) || 40;
 
-      // Валідація: мін не може бути більше, ніж клітинок (мінус одна)
       if (m >= r * c) {
         m = r * c - 1;
         console.warn(`Кількість мін зависока. Зменшено до ${m}`);
@@ -77,9 +78,8 @@ function getGameSettings() {
  */
 function newGame() {
   console.log("--- 🚀 ПОЧАТОК НОВОЇ ГРИ ---");
-  stopTimer(); // Завдання 5
+  stopTimer();
 
-  // Отримуємо налаштування
   const settings = getGameSettings();
   rows = settings.r;
   cols = settings.c;
@@ -91,38 +91,83 @@ function newGame() {
   flagsPlaced = 0;
   time = 0;
 
-  console.log(`Налаштування: ${rows}x${cols}, ${mines} мін`);
-  console.log("UI Update (simulated): Status -> 'Граємо'");
-  console.log(`UI Update (simulated): Mines -> ${mines - flagsPlaced}`);
+  // --- Завдання 2: Динамічне відображення ---
+  updateGameStatus('Готовий 😎');
+  updateMinesCount();
+  updateTimer(); // Скидаємо таймер на 000
+  gameBoard.classList.remove('win-animation'); // Знімаємо анімацію перемоги
 
-  // --- Завдання 1: Генерація ігрового поля ---
-  console.log("Завдання 1: Генерація поля...");
+  // Генеруємо логічне поле
   field = generateField(rows, cols, mines);
 
-  // Очікуваний результат 1:
-  console.log("Очікуваний результат (Завдання 1): Поле згенеровано.");
-  // Для візуалізації відповіді виводимо "карту" в консоль
-  const solutionGrid = field.map(row =>
-    row.map(cell => cell.isMine ? '💣' : cell.neighbourMines)
-  );
-  console.log("Карта розв'язку (для перевірки):");
-  console.table(solutionGrid);
+  // --- Завдання 1: Рендеринг ігрового поля ---
+  renderBoard();
 
-  // --- Завдання 5: Логіка таймера ---
+  // Запускаємо таймер
   startTimer();
 }
 
 // -------------------------------------------------------------------
-// --- ЗАВДАННЯ 1: Генерація ігрового поля ---
+// --- ЗАВДАННЯ 1: Рендеринг ігрового поля ---
 // -------------------------------------------------------------------
 /**
- * @param {number} rows - Кількість рядків
- * @param {number} cols - Кількість стовпців
- * @param {number} mines - Кількість мін
- * @returns {Array<Array<Object>>} - Двовимірний масив (поле)
+ * Створює та відображає ігрове поле в DOM.
  */
+function renderBoard() {
+  gameBoard.innerHTML = ''; // Очищуємо попереднє поле
+
+  // Налаштовуємо CSS Grid для нашого поля
+  gameBoard.style.display = 'grid';
+  // Використовуємо 30px, як задано у styles.css
+  gameBoard.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = field[r][c];
+      const cellEl = document.createElement('div');
+      cellEl.classList.add('cell');
+
+      // --- Завдання 3: Обробка подій кліків ---
+
+      // Лівий клік
+      cellEl.addEventListener('click', () => {
+        if (gameOver || cell.isRevealed || cell.isFlagged) return;
+        openCell(r, c);
+        renderBoard(); // Перемальовуємо поле після зміни стану
+      });
+
+      // Правий клік (встановити прапор)
+      cellEl.addEventListener('contextmenu', (e) => {
+        e.preventDefault(); // Забороняємо стандартне контекстне меню
+        if (gameOver || cell.isRevealed) return;
+        toggleFlag(r, c);
+        renderBoard(); // Перемальовуємо поле після зміни стану
+      });
+
+      // --- Візуалізація стану клітинки ---
+      if (cell.isRevealed) {
+        cellEl.classList.add('revealed');
+        if (cell.isMine) {
+          cellEl.classList.add('mine');
+          cellEl.textContent = '💣';
+        } else if (cell.neighbourMines > 0) {
+          cellEl.textContent = cell.neighbourMines;
+          cellEl.setAttribute('data-count', cell.neighbourMines);
+        }
+      } else if (cell.isFlagged) {
+        cellEl.classList.add('flagged');
+        cellEl.textContent = '🚩';
+      }
+
+      gameBoard.appendChild(cellEl);
+    }
+  }
+}
+
+
+// --- Логіка гри ---
+
 function generateField(rows, cols, mines) {
-  // 1. Створюємо пусте поле
   let newField = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => ({
       isMine: false,
@@ -132,52 +177,33 @@ function generateField(rows, cols, mines) {
     }))
   );
 
-  // 2. Розставляємо міни
   let minesPlaced = 0;
   while (minesPlaced < mines) {
     const r = Math.floor(Math.random() * rows);
     const c = Math.floor(Math.random() * cols);
-
     if (!newField[r][c].isMine) {
       newField[r][c].isMine = true;
       minesPlaced++;
     }
   }
 
-  // 3. Розраховуємо сусідні міни (використовуючи Завдання 2)
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (!newField[r][c].isMine) {
-        // --- Завдання 2: Підрахунок мін (використання) ---
         newField[r][c].neighbourMines = countNeighbourMines(newField, r, c);
       }
     }
   }
-
   return newField;
 }
 
-// -------------------------------------------------------------------
-// --- ЗАВДАННЯ 2: Підрахунок кількості мін навколо клітинки ---
-// -------------------------------------------------------------------
-/**
- * @param {Array<Array<Object>>} field - Ігрове поле
- * @param {number} row - Рядок клітинки
- * @param {number} col - Стовпець клітинки
- * @returns {number} - Кількість мін навколо
- */
 function countNeighbourMines(field, row, col) {
   let count = 0;
-
-  // Перебираємо 8 сусідніх клітинок + саму себе
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
-      if (i === 0 && j === 0) continue; // Пропускаємо саму себе
-
+      if (i === 0 && j === 0) continue;
       const newRow = row + i;
       const newCol = col + j;
-
-      // Перевірка, чи не вийшли ми за межі поля
       if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
         if (field[newRow][newCol].isMine) {
           count++;
@@ -188,61 +214,38 @@ function countNeighbourMines(field, row, col) {
   return count;
 }
 
-// -------------------------------------------------------------------
-// --- ЗАВДАННЯ 3: Відкриття клітинки ---
-// -------------------------------------------------------------------
-/**
- * @param {number} row - Рядок
- * @param {number} col - Стовпець
- */
 function openCell(row, col) {
-  console.log(`Спроба відкрити клітинку (${row}, ${col})`);
-
-  // Перевірка виходу за межі поля
-  if (row < 0 || row >= rows || col < 0 || col >= cols) {
-    return;
-  }
-
+  // Перевірки винесені в обробник кліку
   const cell = field[row][col];
 
-  // Не можна відкрити, якщо гра закінчена, клітинка відкрита або з прапорцем
-  if (gameOver || cell.isRevealed || cell.isFlagged) {
-    console.log("...Відкриття неможливе (гра завершена, відкрито або прапорець).");
-    return;
-  }
-
-  // Відкриваємо клітинку
-  cell.isRevealed = true;
-
-  // --- Логіка стану гри ---
   if (cell.isMine) {
-    // а) якщо клітинка з міною → стан гри = програш
-    console.error("💥 БУМ! Гру програно.");
+    // --- Завдання 4: Реалізація логіки завершення гри (Програш) ---
     gameOver = true;
     stopTimer();
-    console.log("UI Update (simulated): Status -> 'Програш'");
-    // (Тут буде логіка показу всіх мін)
-  } else {
-    // б) якщо клітинка без міни → клітинка відкривається
-    cellsOpened++;
-    console.log(`...Клітинку відкрито. Сусідніх мін: ${cell.neighbourMines}`);
+    updateGameStatus('Програш 💥');
+    revealAllMines(); // Показуємо всі міни
+    return; // Більше не відкриваємо
+  }
 
-    // ...а у випадку 0 рекурсивно відкриваються сусідні
-    if (cell.neighbourMines === 0) {
-      console.log("...Це нуль. Рекурсивне відкриття сусідів...");
-      for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
-          if (i === 0 && j === 0) continue;
-          openCell(row + i, col + j); // Рекурсивний виклик
+  cell.isRevealed = true;
+  cellsOpened++;
+
+  if (cell.neighbourMines === 0) {
+    // Рекурсивне відкриття сусідів
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (i === 0 && j === 0) continue;
+        const newRow = row + i;
+        const newCol = col + j;
+        // Перевірка, чи не вийшли ми за межі + чи не відкрита вже
+        if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && !field[newRow][newCol].isRevealed) {
+          openCell(newRow, newCol);
         }
       }
     }
-
-    // Перевірка на перемогу
-    checkWinCondition();
   }
 
-  // Очікуваний результат 3: (див. у консолі після виклику)
+  checkWinCondition();
 }
 
 /**
@@ -251,37 +254,21 @@ function openCell(row, col) {
 function checkWinCondition() {
   const totalNonMines = (rows * cols) - mines;
   if (cellsOpened === totalNonMines) {
-    console.log("🎉 ПЕРЕМОГА! Всі безпечні клітинки відкрито.");
+    // --- Завдання 4: Реалізація логіки завершення гри (Виграш) ---
+    console.log("🎉 ПЕРЕМОГА!");
     gameOver = true;
     stopTimer();
-    console.log("UI Update (simulated): Status -> 'Перемога!'");
+    updateGameStatus('Перемога! 🎉');
+    gameBoard.classList.add('win-animation'); // Додаємо анімацію з CSS
   }
 }
 
-// -------------------------------------------------------------------
-// --- ЗАВДАННЯ 4: Встановлення/зняття прапорця ---
-// -------------------------------------------------------------------
 /**
- * @param {number} row - Рядок
- * @param {number} col - Стовпець
+ * Встановлює/знімає прапорець.
  */
 function toggleFlag(row, col) {
-  console.log(`Спроба поставити/зняти прапор на (${row}, ${col})`);
-
-  // Перевірка виходу за межі поля
-  if (row < 0 || row >= rows || col < 0 || col >= cols) {
-    return;
-  }
-
   const cell = field[row][col];
 
-  // Не можна ставити прапор, якщо гра закінчена або клітинка відкрита
-  if (gameOver || cell.isRevealed) {
-    console.log("...Неможливо (гра завершена або клітинку відкрито).");
-    return;
-  }
-
-  // Перемикаємо стан прапорця
   cell.isFlagged = !cell.isFlagged;
 
   if (cell.isFlagged) {
@@ -290,34 +277,22 @@ function toggleFlag(row, col) {
     flagsPlaced--;
   }
 
-  // Очікуваний результат 4:
-  console.log(`...Стан isFlagged: ${cell.isFlagged}.`);
-  console.log(`UI Update (simulated): Mines -> ${mines - flagsPlaced}`);
+  // --- Завдання 2: Динамічне відображення (лічильник мін) ---
+  updateMinesCount();
 }
-
-// -------------------------------------------------------------------
-// --- ЗАВДАННЯ 5: Логіка таймера ---
-// -------------------------------------------------------------------
 
 /**
  * Запускає таймер гри.
  */
 function startTimer() {
-  // Зупиняємо попередній таймер, якщо він є
   if (timerId) {
     clearInterval(timerId);
   }
 
-  time = 0;
-  console.log("Таймер запущено.");
-  console.log(`Time: ${time}`); // Початковий вивід
-
   timerId = setInterval(() => {
     time++;
-    // Очікуваний результат 5:
-    const formattedTime = time.toString().padStart(3, '0');
-    console.log(`Time: ${formattedTime}`);
-    // (Тут буде оновлення DOM: document.getElementById('timer').textContent = formattedTime;)
+    // --- Завдання 2: Динамічне відображення (таймер) ---
+    updateTimer();
   }, 1000);
 }
 
@@ -328,6 +303,46 @@ function stopTimer() {
   if (timerId) {
     clearInterval(timerId);
     timerId = null;
-    console.log(`Таймер зупинено на ${time} сек.`);
   }
+}
+
+// -------------------------------------------------------------------
+// --- НОВІ ДОПОМІЖНІ ФУНКЦІЇ ДЛЯ DOM ---
+// -------------------------------------------------------------------
+
+/**
+ * Оновлює текст лічильника мін (Завдання 2)
+ */
+function updateMinesCount() {
+  minesCountEl.textContent = mines - flagsPlaced;
+}
+
+/**
+ * Оновлює текст таймера (Завдання 2)
+ */
+function updateTimer() {
+  timerEl.textContent = time.toString().padStart(3, '0');
+}
+
+/**
+ * Оновлює текст статусу гри (Завдання 2)
+ */
+function updateGameStatus(status) {
+  gameStatusEl.textContent = status;
+}
+
+/**
+ * Показує всі міни при програші (Завдання 4)
+ */
+function revealAllMines() {
+  // Ми не перемальовуємо дошку тут,
+  // ми просто оновлюємо стан нашого 'field'.
+  // 'renderBoard()' буде викликаний один раз в обробнику кліку.
+  field.forEach(row => {
+    row.forEach(cell => {
+      if (cell.isMine) {
+        cell.isRevealed = true; // Примусово відкриваємо міни
+      }
+    });
+  });
 }
