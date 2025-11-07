@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // script.js
 
 let board = [];
@@ -140,3 +141,9 @@ gameBoard.addEventListener('mousedown', (e) => {
 });
 
 startBtn.addEventListener('click', startGame);
+=======
+document.getElementById("myButton").addEventListener("click", function () {
+  alert("Button clicked!");
+  alert("Button clicked!");
+});
+>>>>>>> 6b4249a815695ef5518d56e0e0129aeb0db493f0

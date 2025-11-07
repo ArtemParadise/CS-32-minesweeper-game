@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minesweeper UI — Dark Classic</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="bar">
+      <div class="stat">Прапорці: <span class="stat__v" id="flags-left">010</span></div>
+      <button class="btn" id="new-game-btn">Нова гра</button>
+      <div class="stat">Час: <span class="stat__v" id="timer">000</span></div>
+    </div>
+    <section class="board">
+      <div class="grid">
+      </div>
+    </section>
+    <div class="legend">
+      <div class="legend__item">
+        <div class="cell" data-state="closed" style="width:28px;height:28px"></div>Закрита
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="open" data-count="1" style="width:28px;height:28px">1</div>Відкрита
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="flag" style="width:28px;height:28px">🚩</div>Прапорець
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="mine" style="width:28px;height:28px">💣</div>Міна
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="exploded" style="width:28px;height:28px"></div>Вибух
+      </div>
+    </div>
+  </div>
+  <!-- <script src="./script.js"></script>  -->
+  <script src="./script2.js"></script>
+</body>
+</html>
+  <!-- <script src="./script.js"></script>  -->

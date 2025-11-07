@@ -1,0 +1,189 @@
+h1 {
+    font-size: 30px;
+    color: #00ffff;
+    text-shadow: 0 0 0px #00ffff, 0 0 6px #00ffff;
+    margin-top: 100px; 
+    text-align: center; 
+}
+
+body {
+    font-family: 'Montserrat', sans-serif; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: center; 
+    min-height: 100vh;
+    margin: 0;
+    background: 
+        radial-gradient(ellipse 100% 150% at bottom, #1B2735 0%, #090A0F 100%);
+}
+
+.game-container {
+    border: 3px solid #00ffff; 
+    background-color: #1a1a1a; 
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7), inset 0 0 10px rgba(0, 255, 255, 0.5);
+    
+}
+
+.play-btn {
+    font-size: 25px;
+    width: 150px;
+    height: 50px;
+    color: #00ff00;
+    margin-top: 20px;
+    background-color: #330033; 
+    border: 2px solid #00ff00; 
+    border-radius:20px;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7), inset 0 0 5px rgba(0, 255, 0, 0.5);
+    cursor: pointer;
+}
+
+.play-btn:hover {
+    background-color: #3a3a3a;
+    box-shadow: inset 0 0 8px rgba(0, 255, 204, 0.5);
+}
+
+/* Верхня панель */
+.top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #ff00ff; 
+    background-color: #2a002a; 
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.6), inset 0 0 5px rgba(255, 0, 255, 0.4);
+}
+
+.indicator {
+    background-color: #000000; 
+    color: #ff33cc; 
+    font-size: 1.8em;
+    padding: 5px 12px;
+    border: 2px solid #ff33cc;
+    box-shadow: 0 0 8px rgba(255, 51, 204, 0.8);
+    border-radius: 3px;
+}
+
+
+.start-btn:active {
+    transform: scale(0.90);
+}
+
+/* Ігрове поле */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, 35px); 
+    grid-template-rows: repeat(9, 35px);
+    gap: 2px;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7), inset 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.cell {
+    border: 1px solid #00ccff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #00ffcc;
+    text-shadow: 0 0 3px #00ffcc;
+    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.cell.closed {
+    background-color: #2a2a2a; 
+    box-shadow: inset 0 0 5px rgba(0, 255, 204, 0.3);
+}
+
+.cell.closed:hover {
+    background-color: #3a3a3a;
+    box-shadow: inset 0 0 8px rgba(0, 255, 204, 0.5);
+}
+
+.cell.open {
+    background-color: #0a0a0a; 
+    border: 1px solid #006699; 
+    box-shadow: inset 0 0 5px rgba(0, 102, 153, 0.7);
+    cursor: default;
+    color: #00ffcc; 
+    text-shadow: 0 0 5px #00ffcc;
+}
+
+.cell.flag {
+    background-color: #2a2a2a;
+    color: #ff00ff;
+    cursor: pointer;
+    text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+}
+
+
+.cell.mine {
+    background-color: #0a0a0a;
+    color: #ff3300; 
+    text-shadow: 0 0 5px #ff3300, 0 0 10px #ff3300;
+    box-shadow: inset 0 0 5px rgba(255, 51, 0, 0.7);
+    cursor: default;
+}
+
+.cell.exploded {
+    border: 1px solid #ff3300;
+}
+
+.cell.hit {
+    background-color: #990000; 
+    color: #ff6666; 
+    text-shadow: 0 0 5px #ff6666, 0 0 10px #ff6666;
+    border: 1px solid #ff6666;
+    box-shadow: inset 0 0 8px rgba(255, 102, 102, 0.9);
+    cursor: default;
+}
+
+/* Кольори для чисел */
+.cell.open.num-1 { color: #0099ff; text-shadow: 0 0 5px #0099ff; }
+.cell.open.num-2 { color: #00cc66; text-shadow: 0 0 5px #00cc66; }
+.cell.open.num-3 { color: #ff3300; text-shadow: 0 0 5px #ff3300; }
+
+.cell.flag.mine {
+    position: relative;
+    background-color: #2a2a2a;
+    border: 1px solid #ff00ff;
+    box-shadow: inset 0 0 5px rgba(255, 0, 255, 0.7);
+    cursor: pointer;
+}
+
+.mine-icon {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.3;
+    font-size: 1.3em;
+    pointer-events: none;
+}
+
+.flag-icon {
+    position: absolute;
+    z-index: 2;
+}
+
+.notification {
+    margin: 0;
+    flex: 0 1 120px;
+    text-align: center;
+    overflow: hidden;
+    word-wrap: break-word;
+    font-size: 20px;
+}
+
+.success{
+    color:#00ff00;
+}
+
+.error{
+    color:#ff3300
+}
+
+

@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.game-container {
+    background-color: #c0c0c0;
+    padding: 10px;
+    border: 3px outset #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    background-color: #c0c0c0;
+    border: 2px inset #808080;
+}
+
+.mines-counter, .timer {
+    background-color: #000;
+    color: #f00;
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    padding: 2px 6px;
+    border: 2px inset #808080;
+    width: 60px;
+    text-align: center;
+}
+
+.restart-button {
+    background-color: #c0c0c0;
+    border: 2px outset #fff;
+    font-size: 24px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.restart-button:hover { background-color: #d0d0d0; }
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(9, 24px);
+  grid-auto-rows: 24px;
+  gap: 0;
+  background-color: #c0c0c0;
+  border: 2px inset #808080;
+}
+
+.cell {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+  cursor: pointer;
+}
+.cell.closed { border: 3px outset #fff; background: #c0c0c0; }
+.cell.opened { background: #c0c0c0; border: 1px solid #808080; cursor: default; }
+
+.cell.flagged { background: #c0c0c0; }
+.cell.flagged::after { content: "🚩"; }
+
+.cell.mine.revealed { background: #c0c0c0; }
+.cell.mine-triggered { background: #f00; }
+.cell.mine::after { content: "💣"; }
+
+/* Кольори чисел */
+.cell.num1 { color: #00f; }
+.cell.num2 { color: #008000; }
+.cell.num3 { color: #f00; }
+.cell.num4 { color: #000080; }
+.cell.num5 { color: #800000; }
+.cell.num6 { color: #008080; }
+.cell.num7 { color: #000; }
+.cell.num8 { color: #808080; }

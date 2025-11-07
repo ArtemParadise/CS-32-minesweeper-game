@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper - Гра Сапер</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💣 Minesweeper</h1>
+            <p class="subtitle">Класична гра Сапер</p>
+        </header>
+
+        <div class="game-controls">
+            <div class="difficulty-selector">
+                <label for="difficulty">Рівень складності:</label>
+                <select id="difficulty">
+                    <option value="beginner">Початківець (9x9, 10 мін)</option>
+                    <option value="intermediate" selected>Середній (16x16, 40 мін)</option>
+                    <option value="expert">Експерт (16x30, 99 мін)</option>
+                    <option value="custom">Користувацький</option>
+                </select>
+            </div>
+
+            <div class="custom-settings" id="customSettings" style="display: none;">
+                <div class="custom-input">
+                    <label for="customWidth">Ширина:</label>
+                    <input type="number" id="customWidth" min="5" max="30" value="16">
+                </div>
+                <div class="custom-input">
+                    <label for="customHeight">Висота:</label>
+                    <input type="number" id="customHeight" min="5" max="30" value="16">
+                </div>
+                <div class="custom-input">
+                    <label for="customMines">Кількість мін:</label>
+                    <input type="number" id="customMines" min="1" max="200" value="40">
+                </div>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Міни:</span>
+                    <span class="stat-value" id="minesCount">40</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Час:</span>
+                    <span class="stat-value" id="timer">000</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Статус:</span>
+                    <span class="stat-value" id="gameStatus">Готовий</span>
+                </div>
+            </div>
+
+            <button id="newGameBtn" class="new-game-btn">🔄 Нова гра</button>
+        </div>
+
+        <div class="game-container">
+            <div class="game-board" id="gameBoard">
+                <!-- Ігрове поле буде створено динамічно -->
+            </div>
+        </div>
+
+        <div class="game-info">
+            <h3>Як грати:</h3>
+            <ul>
+                <li>🖱️ <strong>Лівий клік</strong> - відкрити клітинку</li>
+                <li>🖱️ <strong>Правий клік</strong> - поставити/прибрати прапор</li>
+                <li>🎯 <strong>Мета</strong> - знайти всі міни, не підірвавшись</li>
+                <li>🔢 <strong>Числа</strong> - показують кількість мін навколо</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>Створено з ❤️ для CS-32</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
