@@ -57,23 +57,23 @@ function generateField(rows, cols, mines) {
 
   // Розставляємо міни випадково
   const positions = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) positions.push([r, c]);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) positions.push([row, col]);
   }
   // перемішування Фішера-Йейтса
   for (let i = positions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
-  for (let k = 0; k < mines; k++) {
-    const [r, c] = positions[k];
-    field[r][c].hasMine = true;
+  for (let mineIndex = 0; mineIndex < mines; mineIndex++) {
+    const [mineRow, mineCol] = positions[mineIndex];
+    field[mineRow][mineCol].hasMine = true;
   }
 
   // Заповнюємо adjacentMines
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      field[r][c].adjacentMines = countNeighbourMines(field, r, c);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      field[row][col].adjacentMines = countNeighbourMines(field, row, col);
     }
   }
 
@@ -91,17 +91,26 @@ function generateField(rows, cols, mines) {
 
 // 2) Підрахунок кількості мін навколо клітинки
 function countNeighbourMines(field, row, col) {
-  const rows = field.length;
-  const cols = field[0].length;
-  let count = 0;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      if (dr === 0 && dc === 0) continue;
-      const r = row + dr, c = col + dc;
-      if (r >= 0 && c >= 0 && r < rows && c < cols && field[r][c].hasMine) count++;
+  const totalRows = field.length;
+  const totalCols = field[0].length;
+  let minesCount = 0;
+  for (let directionalRow = -1; directionalRow <= 1; directionalRow++) {
+    for (let directionalCol = -1; directionalCol <= 1; directionalCol++) {
+      if (directionalRow === 0 && directionalCol === 0) continue;
+      const neighbourRow = row + directionalRow;
+      const neighbourCol = col + directionalCol;
+      if (
+        neighbourRow >= 0 &&
+        neighbourCol >= 0 &&
+        neighbourRow < totalRows &&
+        neighbourCol < totalCols &&
+        field[neighbourRow][neighbourCol].hasMine
+      ) {
+        minesCount++;
+      }
     }
   }
-  return count;
+  return minesCount;
 }
 
 // 3) Відкриття клітинки
@@ -137,8 +146,8 @@ function openCell(row, col) {
   updateHud();
 }
 
-function floodOpen(row, col) {
-  const stack = [[row, col]];
+function floodOpen(startRow, startCol) {
+  const stack = [[startRow, startCol]];
   const seen = new Set();
 
   const key = (r, c) => `${r},${c}`;
