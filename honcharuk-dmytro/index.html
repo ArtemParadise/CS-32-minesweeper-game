@@ -9,95 +9,34 @@
 <body>
   <div class="app">
     <div class="bar">
-      <div class="stat">Прапорці: <span class="stat__v">010</span></div>
-      <button class="btn">Нова гра</button>
-      <div class="stat">Час: <span class="stat__v">000</span></div>
+      <div class="stat">Прапорці: <span class="stat__v" id="flags-left">010</span></div>
+      <button class="btn" id="new-game-btn">Нова гра</button>
+      <div class="stat">Час: <span class="stat__v" id="timer">000</span></div>
     </div>
-
     <section class="board">
       <div class="grid">
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="open" data-count="3">3</button>
-        <button class="cell" data-state="flag">🚩</button>
-        <button class="cell" data-state="mine">💣</button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="open" data-count="4">4</button>
-
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="flag">🚩</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="mine">💣</button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="3">3</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="8">8</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="mine">💣</button>
-        <button class="cell" data-state="flag">🚩</button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="mine">💣</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="3">3</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="flag">🚩</button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="1">1</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="mine">💣</button>
-        <button class="cell" data-state="open" data-count="2">2</button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="closed"></button>
-        <button class="cell" data-state="open" data-count="1">1</button>
       </div>
     </section>
-
     <div class="legend">
-      <div class="legend__item"><div class="cell" data-state="closed" style="width:28px;height:28px"></div>Закрита</div>
-      <div class="legend__item"><div class="cell" data-state="open" data-count="1" style="width:28px;height:28px">1</div>Відкрита</div>
-      <div class="legend__item"><div class="cell" data-state="flag" style="width:28px;height:28px">🚩</div>Прапорець</div>
-      <div class="legend__item"><div class="cell" data-state="mine" style="width:28px;height:28px">💣</div>Міна</div>
-      <div class="legend__item"><div class="cell" data-state="exploded" style="width:28px;height:28px"></div>Вибух</div>
+      <div class="legend__item">
+        <div class="cell" data-state="closed" style="width:28px;height:28px"></div>Закрита
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="open" data-count="1" style="width:28px;height:28px">1</div>Відкрита
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="flag" style="width:28px;height:28px">🚩</div>Прапорець
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="mine" style="width:28px;height:28px">💣</div>Міна
+      </div>
+      <div class="legend__item">
+        <div class="cell" data-state="exploded" style="width:28px;height:28px"></div>Вибух
+      </div>
     </div>
   </div>
-  <script src="script.js"></script>
+  <!-- <script src="./script.js"></script>  -->
+  <script src="./script2.js"></script>
 </body>
 </html>
+  <!-- <script src="./script.js"></script>  -->
