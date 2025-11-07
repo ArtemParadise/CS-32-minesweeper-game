@@ -1,0 +1,32 @@
+/* style.css */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  
+  .controls {
+    margin-bottom: 10px;
+  }
+  
+  #gameBoard {
+    display: grid;
+    margin: 0 auto;
+    gap: 2px;
+  }
+  
+  .cell {
+    width: 30px;
+    height: 30px;
+    background-color: #ccc;
+    border: 1px solid #999;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .cell.open {
+    background-color: #eee;
+  }
+  
+  .cell.flag {
+    background-color: #f99;
+  }
