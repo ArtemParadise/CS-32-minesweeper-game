@@ -1,8 +1,23 @@
-function createCell(hasMine = false, adjacentMines = 0, state = "closed") {
+// === КОНСТАНТИ ДЛЯ СТАНІВ КЛІТИНОК ===
+const CELL_STATE = {
+  CLOSED: 'closed',
+  OPEN: 'open',
+  FLAGGED: 'flagged',
+  EXPLODED: 'exploded'
+};
+
+// === КОНСТАНТИ ДЛЯ СТАНУ ГРИ ===
+const GAME_STATUS = {
+  IN_PROGRESS: 'in_progress',
+  WIN: 'win',
+  LOSE: 'lose'
+};
+
+function createCell(hasMine = false, adjacentMines = 0, state = CELL_STATE.CLOSED) {
     return {
       hasMine: hasMine,             // чи є міна (true/false)
       adjacentMines: adjacentMines, // кількість мін навколо (0-8)
-      state: state                  // "closed" | "open" | "flagged"
+      state: state                  // CELL_STATE.CLOSED | CELL_STATE.OPEN | CELL_STATE.FLAGGED | CELL_STATE.EXPLODED
     };
   }
   
@@ -24,7 +39,7 @@ function createGameState(rows, cols, minesCount) {
       rows: rows,                   // кількість рядків
       cols: cols,                   // кількість колонок
       minesCount: minesCount,       // загальна кількість мін
-      status: "in_progress",        // "in_progress" | "win" | "lose"
+      status: GAME_STATUS.IN_PROGRESS,        // GAME_STATUS.IN_PROGRESS | GAME_STATUS.WIN | GAME_STATUS.LOSE
       field: createField(rows, cols) // саме поле (двовимірний масив клітинок)
     };
   }
@@ -79,14 +94,14 @@ function checkWin(game) {
 
   for (let r = 0; r < game.rows; r++) {
     for (let c = 0; c < game.cols; c++) {
-      if (game.field[r][c].state === "open" && !game.field[r][c].hasMine) {
+      if (game.field[r][c].state === CELL_STATE.OPEN && !game.field[r][c].hasMine) {
         opened++;
       }
     }
   }
 
   if (opened === safeCells) {
-    game.status = "win";
+    game.status = GAME_STATUS.WIN;
     stopTimer();
     setTimeout(() => {
       console.log("🏆 ВИГРАШ! Усі безпечні клітинки відкрито!");
@@ -99,8 +114,8 @@ function revealMines(game) {
   for (let r = 0; r < game.rows; r++) {
     for (let c = 0; c < game.cols; c++) {
       const currentCell = game.field[r][c];
-      if (currentCell.hasMine && currentCell.state !== "exploded") {
-        currentCell.state = "open";
+      if (currentCell.hasMine && currentCell.state !== CELL_STATE.EXPLODED) {
+        currentCell.state = CELL_STATE.OPEN;
       }
     }
   }
@@ -108,10 +123,10 @@ function revealMines(game) {
 function openCell(game, row, col) {
   if (timerId === null) startTimer();
   const cell = game.field[row][col];
-  if (cell.state !== "closed" || game.status !== "in_progress") return;
+  if (cell.state !== CELL_STATE.CLOSED || game.status !== GAME_STATUS.IN_PROGRESS) return;
   if (cell.hasMine) {
-    cell.state = "exploded";
-    game.status = "lose";
+    cell.state = CELL_STATE.EXPLODED;
+    game.status = GAME_STATUS.LOSE;
     stopTimer(); // зупиняємо таймер після програшу
     // 🔹 Відкрити всі міни
     revealMines(game);
@@ -123,7 +138,7 @@ function openCell(game, row, col) {
 
     return;
   }
-  cell.state = "open";
+  cell.state = CELL_STATE.OPEN;
   if (cell.adjacentMines === 0) {
     for (let directionRow = -1; directionRow <= 1; directionRow++) {
       for (let directionCol = -1; directionCol <= 1; directionCol++) {
@@ -138,7 +153,7 @@ function openCell(game, row, col) {
   }
   // 🔹 Перевірка на виграш після відкриття клітинки
   if (checkWin(game)) {
-    game.status = "win";
+    game.status = GAME_STATUS.WIN;
     stopTimer();
   }
 }
@@ -146,10 +161,10 @@ function openCell(game, row, col) {
 
 function toggleFlag(game, row, col) {
   const cell = game.field[row][col];
-  if (cell.state === "closed") {
-    cell.state = "flagged";
-  } else if (cell.state === "flagged") {
-    cell.state = "closed";
+  if (cell.state === CELL_STATE.CLOSED) {
+    cell.state = CELL_STATE.FLAGGED;
+  } else if (cell.state === CELL_STATE.FLAGGED) {
+    cell.state = CELL_STATE.CLOSED;
   }
   console.log(
     `toggleFlag: cell [${row},${col}] now is "${cell.state}"`
@@ -182,7 +197,7 @@ function renderGameField(game) {
       // Отримуємо дані клітинки з ігрового стану
       const gameCell = game.field[r][c];
       // Визначаємо стан клітинки та додаємо відповідні класи
-      if (gameCell.state === "open") {
+      if (gameCell.state === CELL_STATE.OPEN) {
         cell.classList.add('open');
         if (gameCell.hasMine) {
           // Якщо це міна - показуємо символ міни
@@ -193,11 +208,11 @@ function renderGameField(game) {
           cell.classList.add(`num-${gameCell.adjacentMines}`);
           cell.textContent = gameCell.adjacentMines;
         }
-      } else if (gameCell.state === "exploded") {
+      } else if (gameCell.state === CELL_STATE.EXPLODED) {
         // Якщо клітинка вибухнула
         cell.classList.add('mine', 'exploded');
         cell.innerHTML = '💥'
-      } else if (gameCell.state === "flagged") {
+      } else if (gameCell.state === CELL_STATE.FLAGGED) {
         // Якщо клітинка позначена прапорцем
         cell.classList.add('flag');
         cell.innerHTML = '🚩';
@@ -253,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!cell.classList.contains('cell') || !game) return;
 
     // Якщо гра вже завершена — не реагуємо
-  if (game.status !== "in_progress") return;
+  if (game.status !== GAME_STATUS.IN_PROGRESS) return;
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
@@ -270,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!cell.classList.contains('cell') || !game) return;
 
     // Блокуємо, якщо гра завершена
-  if (game.status !== "in_progress") return;
+  if (game.status !== GAME_STATUS.IN_PROGRESS) return;
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
@@ -293,11 +308,11 @@ function updateFlagsCount() {
 function toggleFlag(game, row, col) {
   const cell = game.field[row][col];
 
-  if (cell.state === "closed" && flagsLeft > 0) {
-    cell.state = "flagged";
+  if (cell.state === CELL_STATE.CLOSED && flagsLeft > 0) {
+    cell.state = CELL_STATE.FLAGGED;
     flagsLeft--;
-  } else if (cell.state === "flagged") {
-    cell.state = "closed";
+  } else if (cell.state === CELL_STATE.FLAGGED) {
+    cell.state = CELL_STATE.CLOSED;
     flagsLeft++;
   }
 
