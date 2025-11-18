@@ -1,4 +1,143 @@
-document.getElementById("myButton").addEventListener("click", function () {
-  alert("Button clicked!");
-  alert("Button clicked!");
-});
+</style>
+</head>
+<body>
+  <h1>Мінер</h1>
+  <div id="info">
+    <button onclick="startGame()">Нова гра</button>
+    <span id="timer">⏱ 0 сек</span>
+  </div>
+  <div id="game"></div>
+
+  <script>
+    let field = [], opened = [], flags = [];
+    let rows = 8, cols = 8, mines = 10;
+    let gameOver = false, timer = null, seconds = 0;
+    let firstClick = true;
+
+    function startGame() {
+      field = Array.from({ length: rows }, () => Array(cols).fill(0));
+      opened = Array.from({ length: rows }, () => Array(cols).fill(false));
+      flags = Array.from({ length: rows }, () => Array(cols).fill(false));
+      gameOver = false;
+      firstClick = true;
+      seconds = 0;
+      clearInterval(timer);
+      document.getElementById("timer").textContent = "⏱ 0 сек";
+      renderField();
+    }
+
+    function placeMines(safeRow, safeCol) {
+      let placed = 0;
+      while (placed < mines) {
+        let r = Math.floor(Math.random() * rows);
+        let c = Math.floor(Math.random() * cols);
+        if (Math.abs(r - safeRow) <= 1 && Math.abs(c - safeCol) <= 1) continue;
+        if (field[r][c] !== "M") {
+          field[r][c] = "M";
+          placed++;
+        }
+      }
+    }
+
+    function countNeighbourMines(row, col) {
+      if (field[row][col] === "M") return "💣";
+      let count = 0;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          let nr = row + dr, nc = col + dc;
+          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+            if (field[nr][nc] === "M") count++;
+          }
+        }
+      }
+      return count;
+    }
+
+    function openCell(row, col) {
+      if (gameOver || opened[row][col] || flags[row][col]) return;
+
+      if (firstClick) {
+        placeMines(row, col);
+        firstClick = false;
+        startTimer();
+      }
+
+      if (field[row][col] === "M") {
+        alert("❌ Ви підірвались. Гра закінчена.");
+        gameOver = true;
+        stopTimer();
+        opened[row][col] = true;
+        renderField();
+        return;
+      }
+
+      let count = countNeighbourMines(row, col);
+      opened[row][col] = true;
+
+      if (count === 0) {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            let nr = row + dr, nc = col + dc;
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+              if (!opened[nr][nc]) openCell(nr, nc);
+            }
+          }
+        }
+      }
+
+      renderField();
+    }
+
+    function toggleFlag(row, col) {
+      if (opened[row][col] || gameOver || firstClick) return;
+      flags[row][col] = !flags[row][col];
+      renderField();
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        seconds++;
+        document.getElementById("timer").textContent = `⏱ ${seconds} сек`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function renderField() {
+      const gameDiv = document.getElementById("game");
+      gameDiv.innerHTML = "";
+      gameDiv.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+
+          if (opened[r][c]) {
+            cell.classList.add("opened");
+            const val = countNeighbourMines(r, c);
+            cell.textContent = val === 0 ? "" : val;
+          } else {
+            if (flags[r][c]) {
+              cell.textContent = "🚩";
+              cell.classList.add("flagged");
+            }
+          }
+
+          cell.onclick = () => openCell(r, c);
+          cell.oncontextmenu = (e) => {
+            e.preventDefault();
+            toggleFlag(r, c);
+          };
+
+          gameDiv.appendChild(cell);
+        }
+      }
+    }
+
+    
