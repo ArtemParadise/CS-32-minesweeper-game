@@ -53,11 +53,11 @@ function getGameSettings() {
   const level = difficultySelect.value;
   switch (level) {
     case 'beginner':
-      return { r: 9, c: 9, m: 10 };
+      return { row: 9, col: 9, mines: 10 };
     case 'intermediate':
-      return { r: 16, c: 16, m: 40 };
+      return { row: 16, col: 16, mines: 40 };
     case 'expert':
-      return { r: 16, c: 30, m: 99 };
+      return { row: 16, col: 30, mines: 99 };
     case 'custom':
       const r = parseInt(customHeightInput.value) || 16;
       const c = parseInt(customWidthInput.value) || 16;
@@ -67,9 +67,9 @@ function getGameSettings() {
         m = r * c - 1;
         console.warn(`Кількість мін зависока. Зменшено до ${m}`);
       }
-      return { r, c, m };
+      return { row: r, col: c, mines: m };
     default:
-      return { r: 16, c: 16, m: 40 }; // Fallback
+      return { row: 16, col: 16, mines: 40 }; // Fallback
   }
 }
 
@@ -81,9 +81,9 @@ function newGame() {
   stopTimer();
 
   const settings = getGameSettings();
-  rows = settings.r;
-  cols = settings.c;
-  mines = settings.m;
+  rows = settings.row;
+  cols = settings.col;
+  mines = settings.mines;
 
   // Скидаємо стан гри
   gameOver = false;
