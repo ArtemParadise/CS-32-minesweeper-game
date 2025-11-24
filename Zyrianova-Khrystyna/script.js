@@ -7,179 +7,261 @@ const rows = 10;
 const cols = 10;
 const minesCount = 10;
 
-let boardData = [];
+let boardData = [];           // двовимірний масив із об'єктами клітинок
 let flags = minesCount;
-let timer;
+let timerId = null;
 let seconds = 0;
 let gameOver = false;
+let firstClick = true;        // щоб забезпечити безпечний перший клік
 
-// Створення гри
+// -------------------- ІНІЦІАЛІЗАЦІЯ --------------------
 function initGame() {
-    clearInterval(timer);
-    seconds = 0;
-    timerDisplay.textContent = seconds;
-    flags = minesCount;
-    flagsDisplay.textContent = flags;
-    gameOver = false;
-    boardData = [];
-    board.innerHTML = '';
+  // Скидання стану
+  stopTimer();
+  seconds = 0;
+  timerDisplay.textContent = seconds;
+  flags = minesCount;
+  flagsDisplay.textContent = flags;
+  gameOver = false;
+  firstClick = true;
+  boardData = [];
+  board.innerHTML = '';
 
-    // Генерація клітинок
-    for (let r = 0; r < rows; r++) {
-        const row = [];
-        for (let c = 0; c < cols; c++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell', 'closed');
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-            cell.addEventListener('click', leftClick);
-            cell.addEventListener('contextmenu', rightClick);
-            board.appendChild(cell);
-            row.push({ mine: false, element: cell, open: false, flagged: false, neighborMines: 0 });
-        }
-        boardData.push(row);
+  //  DOM та структура поля без мін (міни поставимо при першому кліку)
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      const cellEl = document.createElement('div');
+      cellEl.classList.add('cell', 'closed');
+      cellEl.dataset.row = r;
+      cellEl.dataset.col = c;
+
+      // Події
+      cellEl.addEventListener('click', leftClick);
+      cellEl.addEventListener('contextmenu', rightClick);
+
+      board.appendChild(cellEl);
+
+      row.push({
+        mine: false,
+        open: false,
+        flagged: false,
+        neighborMines: 0,
+        element: cellEl,
+      });
     }
+    boardData.push(row);
+  }
 
-    placeMines();
+}
+
+// -------------------- РОЗСТАНОВКА МІН --------------------
+function placeMinesSafe(excludeRow, excludeCol) {
+  // Поміщуємо minesCount мін так, щоб (excludeRow, excludeCol) і його сусіди були вільні
+  let placed = 0;
+  const forbidden = new Set();
+
+  // Забороняємо саму клітинку first click і її сусідів
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const rr = excludeRow + dr;
+      const cc = excludeCol + dc;
+      if (rr >= 0 && rr < rows && cc >= 0 && cc < cols) {
+        forbidden.add(rr + '-' + cc);
+      }
+    }
+  }
+
+  while (placed < minesCount) {
+    const r = Math.floor(Math.random() * rows);
+    const c = Math.floor(Math.random() * cols);
+    const key = r + '-' + c;
+    if (forbidden.has(key)) continue;
+    if (!boardData[r][c].mine) {
+      boardData[r][c].mine = true;
+      placed++;
+    }
+  }
+}
+
+// -------------------- ПІДРАХУНОК СУСІДНІХ МІН --------------------
+function countNeighbourMines(field, row, col) {
+  let count = 0;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const nr = row + dr;
+      const nc = col + dc;
+      if (nr >= 0 && nr < field.length && nc >= 0 && nc < field[0].length) {
+        if (field[nr][nc].mine) count++;
+      }
+    }
+  }
+  return count;
+}
+
+function calculateNeighbors() {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (!boardData[r][c].mine) {
+        boardData[r][c].neighborMines = countNeighbourMines(boardData, r, c);
+      } else {
+        boardData[r][c].neighborMines = -1; // маркер для міни
+      }
+    }
+  }
+}
+
+// -------------------- ЛІВИЙ КЛІК --------------------
+function leftClick(e) {
+  if (gameOver) return;
+  const r = parseInt(this.dataset.row, 10);
+  const c = parseInt(this.dataset.col, 10);
+
+  // Якщо перший клік — розставляємо міни безпечним способом, розраховуємо сусідів і стартуємо таймер
+  if (firstClick) {
+    placeMinesSafe(r, c);
     calculateNeighbors();
     startTimer();
+    firstClick = false;
+  }
+
+  openCell(boardData, r, c);
 }
 
-// Розстановка мін
-function placeMines() {
-    let placed = 0;
-    while (placed < minesCount) {
-        const r = Math.floor(Math.random() * rows);
-        const c = Math.floor(Math.random() * cols);
-        if (!boardData[r][c].mine) {
-            boardData[r][c].mine = true;
-            placed++;
-        }
-    }
-}
-
-// Обчислення сусідніх мін
-function calculateNeighbors() {
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (boardData[r][c].mine) continue;
-            let count = 0;
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    const nr = r + dr;
-                    const nc = c + dc;
-                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                        if (boardData[nr][nc].mine) count++;
-                    }
-                }
-            }
-            boardData[r][c].neighborMines = count;
-        }
-    }
-}
-
-// Лівий клік
-function leftClick(e) {
-    if (gameOver) return;
-    const r = parseInt(this.dataset.row);
-    const c = parseInt(this.dataset.col);
-    openCell(r, c);
-}
-
-// Правий клік (флаг)
+// -------------------- ПРАВИЙ КЛІК (ФЛАГ) --------------------
 function rightClick(e) {
-    e.preventDefault();
-    if (gameOver) return;
-    const r = parseInt(this.dataset.row);
-    const c = parseInt(this.dataset.col);
-    const cellData = boardData[r][c];
-    if (cellData.open) return;
-
-    if (cellData.flagged) {
-        cellData.flagged = false;
-        cellData.element.classList.remove('flag');
-        flags++;
-    } else if (flags > 0) {
-        cellData.flagged = true;
-        cellData.element.classList.add('flag');
-        flags--;
-    }
-    flagsDisplay.textContent = flags;
+  e.preventDefault();
+  if (gameOver) return;
+  const r = parseInt(this.dataset.row, 10);
+  const c = parseInt(this.dataset.col, 10);
+  toggleFlag(boardData, r, c);
+  flagsDisplay.textContent = flags;
 }
 
-// Відкриття клітинки
-function openCell(r, c) {
-    const cellData = boardData[r][c];
-    if (cellData.open || cellData.flagged) return;
+// -------------------- ВІДКРИТТЯ КЛІТИНКИ (рекурсія для нулів) --------------------
+function openCell(field, row, col) {
+  const cell = field[row][col];
 
-    cellData.open = true;
-    cellData.element.classList.remove('closed');
-    cellData.element.classList.add('open');
+  if (cell.open || cell.flagged || gameOver) return;
+  cell.open = true;
 
-    if (cellData.mine) {
-        cellData.element.classList.add('clicked-mine');
-        gameOver = true;
-        revealMines();
-        alert("Гра завершена! Ти натрапила на міну.");
-        return;
-    }
+  // Обновляємо DOM
+  cell.element.classList.remove('closed');
+  cell.element.classList.add('open');
+  cell.element.classList.remove('flag'); // якщо там був прапорець
 
-    if (cellData.neighborMines > 0) {
-        cellData.element.textContent = cellData.neighborMines;
-    } else {
-        // Рекурсивно відкриваємо сусідні пусті клітинки
-        for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-                const nr = r + dr;
-                const nc = c + dc;
-                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                    openCell(nr, nc);
-                }
-            }
+  if (cell.mine) {
+    // Програш
+    cell.element.classList.add('clicked-mine');
+    gameOver = true;
+    revealMines();
+    stopTimer();
+    setTimeout(() => alert("Гра завершена! Ти натрапила на міну."), 50);
+    return "GAME_OVER";
+  }
+
+  if (cell.neighborMines > 0) {
+    cell.element.textContent = cell.neighborMines;
+    cell.element.dataset.value = cell.neighborMines;
+  } else {
+    // Порожня клітинка — рекурсивно відкриваємо сусідні, але тільки ті, які ще не відкриті
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const nr = row + dr;
+        const nc = col + dc;
+        if (
+          nr >= 0 && nr < rows &&
+          nc >= 0 && nc < cols &&
+          !field[nr][nc].open
+        ) {
+          openCell(field, nr, nc);
         }
+      }
     }
+  }
 
-    checkWin();
+  // Перевірка на перемогу після кожного відкриття
+  checkWin();
+  return "OK";
 }
 
-// Показати всі міни
+// -------------------- ФУНКЦІЯ ПЕРЕКИДУ ПРАПОРЦЯ --------------------
+function toggleFlag(field, row, col) {
+  const cell = field[row][col];
+  if (cell.open || gameOver) return;
+
+  if (cell.flagged) {
+    cell.flagged = false;
+    cell.element.classList.remove('flag');
+    flags++;
+  } else {
+    if (flags <= 0) return; // якщо прапорці закінчилися
+    cell.flagged = true;
+    cell.element.classList.add('flag');
+    flags--;
+  }
+  flagsDisplay.textContent = flags;
+}
+
+// -------------------- ПОКАЗАТИ ВСІ МІНИ --------------------
 function revealMines() {
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const cellData = boardData[r][c];
-            if (cellData.mine && !cellData.open) {
-                cellData.element.classList.add('mine');
-            }
-        }
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = boardData[r][c];
+      if (cell.mine && !cell.open) {
+        cell.element.classList.add('mine');
+      }
     }
+  }
 }
 
-// Перевірка на перемогу
+// -------------------- ПЕРЕВІРКА НА ПЕРЕМОГУ --------------------
 function checkWin() {
-    let opened = 0;
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (boardData[r][c].open) opened++;
-        }
+  let opened = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (boardData[r][c].open) opened++;
     }
-    if (opened === rows * cols - minesCount) {
-        gameOver = true;
-        alert("Вітаю! Ти виграла!");
-        revealMines();
-    }
+  }
+  if (opened === rows * cols - minesCount) {
+    gameOver = true;
+    stopTimer();
+    revealMines();
+    setTimeout(() => alert("Вітаю! Ти виграла!"), 50);
+  }
 }
 
-// Таймер
+// -------------------- ТАЙМЕР --------------------
 function startTimer() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-        seconds++;
-        timerDisplay.textContent = seconds;
-    }, 1000);
+  if (timerId) return;
+  timerId = setInterval(() => {
+    seconds++;
+    timerDisplay.textContent = seconds;
+  }, 1000);
 }
 
-// Старт гри
-restartBtn.addEventListener('click', initGame);
+function stopTimer() {
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+}
 
-// Ініціалізація
+// -------------------- КНОПКА ПЕРЕЗАПУСКУ --------------------
+restartBtn.addEventListener('click', () => {
+  initGame();
+});
+
+
+window._ms = {
+  get field() { return boardData; },
+  open: (r, c) => openCell(boardData, r, c),
+  flag: (r, c) => toggleFlag(boardData, r, c),
+  placeMinesSafe,
+  calculateNeighbors,
+  countNeighbourMines
+};
+
+// -------------------- СТАРТ --------------------
 initGame();
