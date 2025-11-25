@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper UI — Light Minimal</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Gruvbox palette */
+      --bg: #282828;
+      --red: #cc241d;
+      --green: #98971a;
+      --yellow: #d79921;
+      --blue: #458588;
+      --purple: #b16286;
+      --aqua: #689d6a;
+      --gray_light: #a89984;
+      --gray: #928374;
+      --red-bright: #fb4934;
+      --green-bright: #b8bb26;
+      --yellow-bright: #fabd2f;
+      --blue-bright: #83a598;
+      --purple-bright: #d3869b;
+      --aqua-bright: #8ec07c;
+      --fg: #ebdbb2;
+      --bg0-h: #1d2021;
+      --bg0: #282828;
+      --bg1: #3c3836;
+      --bg2: #504945;
+      --bg3: #665c54;
+      --bg4: #7c6f64;
+      --gray-dark: #928374;
+      --orange: #d65d0e;
+      --bg0-s: #32302f;
+      --fg4: #a89984;
+      --fg3: #bdae93;
+      --fg2: #d5c4a1;
+      --fg1: #ebdbb2;
+      --fg0: #fbf1c7;
+      --orange-bright: #fe8019;
+
+      /* UI mapping */
+      --bg: var(--bg0);
+      --panel-bg: var(--bg0-s);
+      --grid-bg: var(--bg1);
+      --border-color: var(--bg2);
+      --text-color: var(--fg1);
+      --text-muted: var(--gray);
+      --accent-color: var(--yellow-bright);
+      --danger-color: var(--red-bright);
+      --cell-closed-bg: var(--bg1);
+      --cell-open-bg: var(--bg2);
+      --cell-hover-bg: var(--bg3);
+      --shadow: 0 4px 6px -1px rgba(235, 219, 178, 0.08), 0 2px 4px -2px rgba(235, 219, 178, 0.06);
+      --font-family: 'JetBrains Mono', monospace;
+      --border-radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #282828;
+        --panel-bg: #32302f;
+        --grid-bg: #3c3836;
+        --border-color: #504945;
+        --text-color: #ebdbb2;
+        --text-muted: #a89984;
+        --accent-color: #fabd2f;
+        --danger-color: #fb4934;
+        --cell-closed-bg: #3c3836;
+        --cell-open-bg: #504945;
+        --cell-hover-bg: #665c54;
+        --shadow: 0 4px 6px -1px rgba(235, 219, 178, 0.08), 0 2px 4px -2px rgba(235, 219, 178, 0.06);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: var(--font-family);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background-color: var(--bg);
+      color: var(--text-color);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .minesweeper-app {
+      width: min(95vw, 700px);
+      background-color: var(--panel-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background-color: var(--bg);
+      border-radius: 6px;
+    }
+
+    .status-display {
+      font-size: 1.1rem;
+      font-weight: 600;
+      background-color: var(--bg2);
+      padding: 8px 16px;
+      border-radius: 6px;
+      min-width: 100px;
+      text-align: center;
+      color: var(--fg1);
+    }
+    
+    .status-display span {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .start-button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--bg0);
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .start-button:hover {
+      background-color: var(--orange-bright);
+      color: var(--fg1);
+    }
+
+    .game-board {
+      --rows: 8;
+      --cols: 8;
+      padding: 12px;
+      background-color: var(--grid-bg);
+      border-radius: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-rows: repeat(var(--rows), 1fr);
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 5px;
+    }
+
+    .cell {
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: clamp(14px, 2.5vw, 22px);
+      border-radius: 4px;
+      background-color: var(--cell-closed-bg);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+    .cell:hover {
+      background-color: var(--cell-hover-bg);
+    }
+
+    .cell[data-state="open"] {
+      background-color: var(--cell-open-bg);
+      border-color: #94a3b8;
+      cursor: default;
+    }
+    
+    .cell[data-state="open"][data-count="1"] { color: var(--blue); }
+    .cell[data-state="open"][data-count="2"] { color: var(--green); }
+    .cell[data-state="open"][data-count="3"] { color: var(--red); }
+    .cell[data-state="open"][data-count="4"] { color: var(--purple); }
+    .cell[data-state="open"][data-count="5"] { color: var(--yellow); }
+    .cell[data-state="open"][data-count="6"] { color: var(--aqua); }
+    .cell[data-state="open"][data-count="7"] { color: var(--orange); }
+    .cell[data-state="open"][data-count="8"] { color: var(--gray); }
+
+    .cell[data-state="flag"] {
+      font-size: clamp(12px, 2vw, 18px);
+      color: var(--red-bright);
+    }
+    
+    .cell[data-state="mine"] {
+      font-size: clamp(12px, 2vw, 18px);
+      background-color: var(--red);
+      color: var(--fg1);
+    }
+
+    .cell[data-state="exploded"] {
+      background-color: var(--danger-color);
+      border-color: var(--red);
+      color: var(--fg1);
+    }
+    
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--fg4);
+      padding: 10px;
+      background-color: var(--bg);
+      border-radius: 6px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-item .cell {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="minesweeper-app">
+    <header class="game-header">
+      <div class="status-display">🚩 <span>010</span></div>
+      <button class="start-button">Нова гра</button>
+      <div class="status-display">⏳ <span>000</span></div>
+    </header>
+
+    <main class="game-board">
+      <div class="grid">
+        <button class="cell" data-state="open" data-count="1">1</button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="closed"></button>
+        <button class="cell" data-state="closed"></button>
+        <button class="cell" data-state="flag">🚩</button>
+        <button class="cell" data-state="mine">💣</button>
+        <button class="cell" data-state="exploded">💣</button>
+        <button class="cell" data-state="open" data-count="3">3</button>
+        
+        <button class="cell" data-state="open" data-count="1"></button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="closed"></button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="open" data-count="2">2</button>
+        <button class="cell" data-state="open" data-count="1">1</button>
+
+        <script>
+          const grid = document.querySelector('.grid');
+          for (let i = 0; i < 6 * 8; i++) {
+            const cell = document.createElement('button');
+            cell.className = 'cell';
+            cell.dataset.state = 'closed';
+            grid.appendChild(cell);
+          }
+        </script>
+      </div>
+    </main>
+
+    <footer class="legend">
+      <div class="legend-item"><div class="cell" data-state="closed"></div> Закрита</div>
+      <div class="legend-item"><div class="cell" data-state="open" data-count="1">1</div> Відкрита</div>
+      <div class="legend-item"><div class="cell" data-state="flag">🚩</div> Прапорець</div>
+      <div class="legend-item"><div class="cell" data-state="mine">💣</div> Міна</div>
+      <div class="legend-item"><div class="cell" data-state="exploded"></div> Вибух</div>
+    </footer>
+  </div>
+
+</body>
+</html>
