@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper Gruvbox</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- ВАШ ГАРНИЙ ДИЗАЙН (CSS) --- */
+    :root {
+      --bg0: #282828; --bg1: #3c3836; --bg2: #504945; --bg3: #665c54;
+      --fg1: #ebdbb2; --red: #cc241d; --red-bright: #fb4934;
+      --green: #98971a; --yellow: #d79921; --blue: #458588;
+      --purple: #b16286; --aqua: #689d6a; --orange-bright: #fe8019;
+      --font-family: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      margin: 0; min-height: 100vh; font-family: var(--font-family);
+      background-color: var(--bg0); color: var(--fg1);
+      display: grid; place-items: center; padding: 20px;
+    }
+
+    .minesweeper-app {
+      width: fit-content; min-width: 300px;
+      background-color: #32302f; border-radius: 8px;
+      padding: 16px; display: flex; flexDirection: column; gap: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .game-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background-color: var(--bg0); border-radius: 6px;
+    }
+
+    .status-display {
+      font-size: 1.1rem; font-weight: 700; background-color: var(--bg2);
+      padding: 8px 16px; border-radius: 6px; min-width: 80px; text-align: center;
+    }
+
+    .start-button {
+      padding: 10px 20px; font-weight: 600; color: var(--bg0);
+      background-color: var(--yellow); border: none; border-radius: 6px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .start-button:hover { background-color: var(--orange-bright); color: var(--fg1); }
+
+    .game-board {
+      padding: 12px; background-color: var(--bg1); border-radius: 6px;
+    }
+
+    .grid {
+      display: grid; gap: 4px;
+      /* Ці змінні будуть змінюватись через JS */
+      grid-template-columns: repeat(var(--cols, 10), 1fr);
+      grid-template-rows: repeat(var(--rows, 10), 1fr);
+    }
+
+    .cell {
+      width: 35px; height: 35px;
+      display: grid; place-items: center; font-weight: 800; font-size: 18px;
+      border-radius: 4px; background-color: var(--bg1);
+      border: 1px solid var(--bg2); cursor: pointer; color: var(--fg1);
+      transition: background-color 0.15s;
+    }
+    .cell:hover { background-color: var(--bg3); }
+
+    .cell[data-state="open"] { background-color: var(--bg2); border-color: #7c6f64; cursor: default; }
+    .cell[data-state="flag"] { color: var(--red-bright); }
+    .cell[data-state="mine"] { background-color: var(--red); color: white; }
+    .cell[data-state="exploded"] { background-color: var(--red-bright); border: 2px solid white; }
+
+    /* Кольори цифр */
+    .cell[data-count="1"] { color: #83a598; }
+    .cell[data-count="2"] { color: #b8bb26; }
+    .cell[data-count="3"] { color: #fb4934; }
+    .cell[data-count="4"] { color: #d3869b; }
+    .cell[data-count="5"] { color: #fabd2f; }
+  </style>
+</head>
+<body>
+
+  <div class="minesweeper-app">
+    <header class="game-header">
+      <div class="status-display">🚩 <span id="flag-count">00</span></div>
+      <button class="start-button" id="start-btn">Reset</button>
+      <div class="status-display">⏳ <span id="timer">000</span></div>
+    </header>
+
+    <main class="game-board" id="board-container">
+      <div class="grid" id="grid">
+        </div>
+    </main>
+  </div>
+
+  <script>
+    // --- ЛОГІКА ГРИ (JAVASCRIPT) ---
+    
+    const CellState = { CLOSED: 'closed', OPEN: 'open', FLAGGED: 'flagged' };
+
+    let gameState = {
+        board: [],
+        rows: 10, cols: 10, minesCount: 12, flagsLeft: 12,
+        status: 'new', timerId: null, secondsElapsed: 0
+    };
+
+    // DOM Елементи
+    const els = {
+        grid: document.getElementById('grid'),
+        boardContainer: document.getElementById('board-container'),
+        timer: document.getElementById('timer'),
+        flags: document.getElementById('flag-count'),
+        btn: document.getElementById('start-btn')
+    };
+
+    // Слухач кнопки
+    els.btn.addEventListener('click', initGame);
+
+    function createCell() {
+        return { hasMine: false, adjacentMines: 0, state: CellState.CLOSED };
+    }
+
+    function generateField(rows, cols, mines) {
+        const board = Array.from({ length: rows }, () => Array.from({ length: cols }, () => createCell()));
+        let minesPlaced = 0;
+        while (minesPlaced < mines) {
+            const r = Math.floor(Math.random() * rows);
+            const c = Math.floor(Math.random() * cols);
+            if (!board[r][c].hasMine) {
+                board[r][c].hasMine = true;
+                minesPlaced++;
+            }
+        }
+        // Рахуємо сусідів
+        const directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+        for(let r=0; r<rows; r++){
+            for(let c=0; c<cols; c++){
+                if(!board[r][c].hasMine){
+                    let count = 0;
+                    for(const [dr, dc] of directions){
+                        const nr = r+dr, nc = c+dc;
+                        if(nr>=0 && nr<rows && nc>=0 && nc<cols && board[nr][nc].hasMine) count++;
+                    }
+                    board[r][c].adjacentMines = count;
+                }
+            }
+        }
+        return board;
+    }
+
+    function initGame() {
+        if(gameState.timerId) clearInterval(gameState.timerId);
+        gameState.status = 'in-progress';
+        gameState.secondsElapsed = 0;
+        gameState.flagsLeft = gameState.minesCount;
+        
+        els.timer.innerText = '000';
+        els.flags.innerText = String(gameState.flagsLeft).padStart(2, '0');
+        els.btn.innerText = 'Reset';
+
+        // Важливо: передаємо розміри у CSS
+        els.grid.style.setProperty('--rows', gameState.rows);
+        els.grid.style.setProperty('--cols', gameState.cols);
+
+        gameState.board = generateField(gameState.rows, gameState.cols, gameState.minesCount);
+        startTimer();
+        renderBoard();
+    }
+
+    function renderBoard() {
+        els.grid.innerHTML = '';
+        gameState.board.forEach((row, rIndex) => {
+            row.forEach((cell, cIndex) => {
+                const btn = document.createElement('div');
+                btn.className = 'cell';
+                
+                if (cell.state === CellState.CLOSED) {
+                    btn.dataset.state = 'closed';
+                } else if (cell.state === CellState.FLAGGED) {
+                    btn.dataset.state = 'flag';
+                    btn.innerText = '🚩';
+                } else if (cell.state === CellState.OPEN) {
+                    if (cell.hasMine) {
+                        btn.dataset.state = (gameState.status === 'defeat' && cell.exploded) ? 'exploded' : 'mine';
+                        btn.innerText = '💣';
+                    } else {
+                        btn.dataset.state = 'open';
+                        if (cell.adjacentMines > 0) {
+                            btn.dataset.count = cell.adjacentMines;
+                            btn.innerText = cell.adjacentMines;
+                        }
+                    }
+                }
+
+                btn.onclick = () => handleLeftClick(rIndex, cIndex);
+                btn.oncontextmenu = (e) => { e.preventDefault(); handleRightClick(rIndex, cIndex); };
+                els.grid.appendChild(btn);
+            });
+        });
+    }
+
+    function handleLeftClick(r, c) {
+        if (gameState.status !== 'in-progress') return;
+        const cell = gameState.board[r][c];
+        if (cell.state !== CellState.CLOSED) return;
+
+        if (cell.hasMine) {
+            cell.state = CellState.OPEN;
+            cell.exploded = true;
+            gameState.status = 'defeat';
+            els.btn.innerText = 'Dead 💀';
+            revealAll();
+            stopTimer();
+        } else {
+            openRecursive(r, c);
+            checkWin();
+        }
+        renderBoard();
+    }
+
+    function handleRightClick(r, c) {
+        if (gameState.status !== 'in-progress') return;
+        const cell = gameState.board[r][c];
+        if (cell.state === CellState.CLOSED && gameState.flagsLeft > 0) {
+            cell.state = CellState.FLAGGED;
+            gameState.flagsLeft--;
+        } else if (cell.state === CellState.FLAGGED) {
+            cell.state = CellState.CLOSED;
+            gameState.flagsLeft++;
+        }
+        els.flags.innerText = String(gameState.flagsLeft).padStart(2, '0');
+        renderBoard();
+    }
+
+    function openRecursive(r, c) {
+        if (r<0 || r>=gameState.rows || c<0 || c>=gameState.cols) return;
+        const cell = gameState.board[r][c];
+        if (cell.state !== CellState.CLOSED) return;
+        
+        cell.state = CellState.OPEN;
+        if (cell.adjacentMines === 0) {
+            const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+            for(const [dr, dc] of dirs) openRecursive(r+dr, c+dc);
+        }
+    }
+
+    function revealAll() {
+        gameState.board.forEach(row => row.forEach(cell => {
+            if (cell.hasMine) cell.state = CellState.OPEN;
+        }));
+    }
+
+    function checkWin() {
+        let closed = 0;
+        gameState.board.forEach(row => row.forEach(cell => {
+            if (cell.state === CellState.CLOSED || cell.state === CellState.FLAGGED) closed++;
+        }));
+        if (closed === gameState.minesCount) {
+            gameState.status = 'victory';
+            els.btn.innerText = 'Win! 🎉';
+            stopTimer();
+        }
+    }
+
+    function startTimer() {
+        if(gameState.timerId) clearInterval(gameState.timerId);
+        gameState.timerId = setInterval(() => {
+            gameState.secondsElapsed++;
+            els.timer.innerText = String(gameState.secondsElapsed).padStart(3, '0');
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if(gameState.timerId) { clearInterval(gameState.timerId); gameState.timerId = null; }
+    }
+
+    // ЗАПУСК!
+    initGame();
+
+  </script>
+</body>
+</html>
