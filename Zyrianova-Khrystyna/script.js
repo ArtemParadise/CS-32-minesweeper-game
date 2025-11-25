@@ -3,9 +3,13 @@ const flagsDisplay = document.getElementById('flags');
 const timerDisplay = document.getElementById('timer');
 const restartBtn = document.getElementById('restart-btn');
 
+console.log('Flags Element:', flagsDisplay);
+console.log('Flags Element is Null:', flagsDisplay === null);
+
 const rows = 10;
 const cols = 10;
 const minesCount = 10;
+
 
 let boardData = [];           // двовимірний масив із об'єктами клітинок
 let flags = minesCount;
@@ -27,7 +31,7 @@ function initGame() {
   boardData = [];
   board.innerHTML = '';
 
-  //  DOM та структура поля без мін (міни поставимо при першому кліку)
+  //  DOM та структура поля без мін (міни ставимо при першому кліку)
   for (let r = 0; r < rows; r++) {
     const row = [];
     for (let c = 0; c < cols; c++) {
@@ -189,20 +193,23 @@ function openCell(field, row, col) {
 // -------------------- ФУНКЦІЯ ПЕРЕКИДУ ПРАПОРЦЯ --------------------
 function toggleFlag(field, row, col) {
   const cell = field[row][col];
-  if (cell.open || gameOver) return;
 
-  if (cell.flagged) {
-    cell.flagged = false;
-    cell.element.classList.remove('flag');
-    flags++;
-  } else {
-    if (flags <= 0) return; // якщо прапорці закінчилися
+  if (cell.open) return;
+
+  if (!cell.flagged && flags > 0) {
     cell.flagged = true;
-    cell.element.classList.add('flag');
     flags--;
+    cell.element.classList.add("flag");
+  } else if (cell.flagged) {
+    cell.flagged = false;
+    flags++;
+    cell.element.classList.remove("flag");
   }
-  flagsDisplay.textContent = flags;
+
+  flagsDisplay.textContent = flags; 
 }
+
+
 
 // -------------------- ПОКАЗАТИ ВСІ МІНИ --------------------
 function revealMines() {
