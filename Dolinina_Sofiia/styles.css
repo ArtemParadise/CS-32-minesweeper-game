@@ -1,0 +1,144 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+    user-select: none; /* Запобігає виділенню тексту */
+}
+
+.game-container {
+    background-color: #c0c0c0;
+    border: 6px solid;
+    border-color: #ffffff #808080 #808080 #ffffff; /* Ефект 3D-рамки */
+    padding: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Стилі заголовка (Header) */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 3px solid;
+    border-color: #808080 #ffffff #ffffff #808080; /* Вдавлений ефект */
+}
+
+/* Лічильники (Counter) */
+.counter {
+    background-color: black;
+    color: red;
+    font-family: 'Digital-7', monospace; /* Імітація цифрового дисплея */
+    font-size: 24px;
+    padding: 2px 6px;
+    border: 1px solid red;
+    min-width: 60px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Кнопка старту/скидання */
+.reset-button {
+    font-size: 24px;
+    cursor: pointer;
+    background-color: #c0c0c0;
+    border: 3px solid;
+    border-color: #ffffff #808080 #808080 #ffffff; /* Ефект випуклої кнопки */
+    padding: 0 4px;
+    line-height: 1; /* Для кращого центрування смайлика */
+}
+
+.reset-button:active {
+    border-color: #808080 #ffffff #ffffff #808080; /* Ефект натискання (вдавлений) */
+}
+
+/* Ігрове поле (Game Board) */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(5, 30px);
+    grid-template-rows: repeat(3, 30px);
+    border: 3px solid;
+    border-color: #808080 #ffffff #ffffff #808080; /* Вдавлений ефект */
+}
+
+/* Стилі для всіх клітинок */
+.cell {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* --- СТАН: закрита клітинка --- */
+.cell.closed {
+    background-color: #c0c0c0;
+    border: 3px solid;
+    border-color: #ffffff #808080 #808080 #ffffff; /* Випуклий вигляд */
+}
+
+.cell.closed:active {
+    background-color: #dcdcdc; /* Невелике затемнення при натисканні */
+    border-color: #808080 #ffffff #ffffff #808080; /* Ефект натискання */
+}
+
+/* --- СТАН: відкрита клітинка (базовий вигляд) --- */
+.cell.opened {
+    background-color: #dcdcdc; /* Світліший фон */
+    border: 1px solid #a0a0a0; /* Плоский, вдавлений вигляд */
+}
+
+.cell.opened.empty {
+    /* Порожня відкрита клітинка */
+    background-color: #dcdcdc;
+}
+
+
+/* --- СТАН: клітинка з прапорцем --- */
+.cell.closed.has-flag {
+    color: red;
+    font-size: 18px;
+    /* Зберігає випуклий вигляд */
+}
+
+/* Додатковий стан: прапорець на не-міні (показується після програшу) */
+.cell.closed.wrong-flag {
+    background-color: #ff9999; /* Рожевий фон для неправильного прапорця */
+    color: black;
+}
+
+
+/* --- СТАН: клітинка з міною --- */
+
+/* клітинка з міною, на яку натиснув користувач */
+.cell.opened.mine-hit {
+    background-color: red; /* Червоний фон */
+    color: black;
+    font-size: 20px;
+}
+
+/* клітинка з міною (показана після програшу) */
+.cell.opened.mine-revealed {
+    background-color: #dcdcdc;
+    color: black;
+    font-size: 20px;
+}
+
+
+/* --- КОЛЬОРИ ЦИФР (стандартні для Minesweeper) --- */
+.cell.number-1 { color: blue; }
+.cell.number-2 { color: green; }
+.cell.number-3 { color: red; }
+.cell.number-4 { color: navy; }
+.cell.number-5 { color: maroon; }
+.cell.number-6 { color: teal; }
+.cell.number-7 { color: black; }
+.cell.number-8 { color: gray; }
