@@ -1,0 +1,124 @@
+.app {
+    --bg0: #282828;
+    --bg1: #3c3836;
+    --bg2: #504945;
+    --bg3: #665c54;
+    --fg1: #ebdbb2;
+    --red: #cc241d;
+    --red-bright: #fb4934;
+    --green: #98971a;
+    --yellow: #d79921;
+    --blue: #458588;
+    --purple: #b16286;
+    --aqua: #689d6a;
+    --orange-bright: #fe8019;
+    --font-family: 'JetBrains Mono', monospace;
+  
+    font-family: var(--font-family);
+    background-color: var(--bg0);
+    color: var(--fg1);
+    width: fit-content;
+    min-width: 300px;
+    margin: 20px auto;
+    background-color: #32302f;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: var(--bg0);
+    border-radius: 6px;
+  }
+  
+  .statusDisplay {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: var(--bg2);
+    padding: 8px 16px;
+    border-radius: 6px;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .startButton {
+    padding: 10px 20px;
+    font-weight: 600;
+    color: var(--bg0);
+    background-color: var(--yellow);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 1.2rem;
+  }
+  
+  .startButton:hover {
+    background-color: var(--orange-bright);
+    color: var(--fg1);
+  }
+  
+  .board {
+    padding: 12px;
+    background-color: var(--bg1);
+    border-radius: 6px;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 4px;
+  }
+  
+  .cell {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 18px;
+    border-radius: 4px;
+    background-color: var(--bg1);
+    border: 1px solid var(--bg2);
+    cursor: pointer;
+    color: var(--fg1);
+    transition: background-color 0.15s;
+  }
+  
+  .cell:hover {
+    background-color: var(--bg3);
+  }
+  
+  .open {
+    background-color: var(--bg2);
+    border-color: #7c6f64;
+    cursor: default;
+  }
+  
+  .flag {
+    color: var(--red-bright);
+  }
+  
+  .mine {
+    background-color: var(--red);
+    color: white;
+  }
+  
+  .exploded {
+    background-color: var(--red-bright);
+    border: 2px solid white;
+  }
+  
+  .count1 { color: #83a598; }
+  .count2 { color: #b8bb26; }
+  .count3 { color: #fb4934; }
+  .count4 { color: #d3869b; }
+  .count5 { color: #fabd2f; }
+
+
