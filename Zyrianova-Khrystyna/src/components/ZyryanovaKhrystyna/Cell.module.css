@@ -1,0 +1,74 @@
+.cell {
+  width: 40px;
+  height: 40px;
+  background: #c0c0c0;
+  border: 2px solid #999;
+  border-radius: 4px;
+  box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+              inset 2px 2px 3px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.cell.open {
+  background-color: #e6e6e6;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+}
+
+.cell.flagged {
+  background-color: #fff6a3;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.35);
+}
+
+.cell.mine {
+  background-color: #ff6b6b;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* Кольори для чисел */
+.cell.open[data-value="1"],
+.cell.number1 {
+  color: #0044ff;
+}
+
+.cell.open[data-value="2"],
+.cell.number2 {
+  color: #008800;
+}
+
+.cell.open[data-value="3"],
+.cell.number3 {
+  color: #cc0000;
+}
+
+.cell.open[data-value="4"],
+.cell.number4 {
+  color: #000088;
+}
+
+.cell.open[data-value="5"],
+.cell.number5 {
+  color: #880000;
+}
+
+.cell.open[data-value="6"],
+.cell.number6 {
+  color: #008888;
+}
+
+.cell.open[data-value="7"],
+.cell.number7 {
+  color: #000000;
+}
+
+.cell.open[data-value="8"],
+.cell.number8 {
+  color: #777777;
+}
+
