@@ -1,76 +1,123 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #dbe9f5, #b8d0e8);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f0f0;
     margin: 0;
 }
 
 .game-container {
-    background-color: #fff;
+    background-color: #f7f7f7;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border: 2px solid #d0d0d0;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    width: fit-content;
 }
 
 .control-panel {
+    border: 2px solid #ccc;
+    background: #eee;
+    padding: 10px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.18);
+}
+
+.control-panel .flags-counter,
+.control-panel .timer {
+    font-size: 18px;
+    font-weight: bold;
 }
 
 button {
-    padding: 8px 12px;
+    padding: 10px 18px;
     border: none;
     border-radius: 6px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #ffcc00;
+    color: #444;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 3px #b89a00;
+    transition: 0.15s;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #ffd633;
+}
+
+button:active {
+    box-shadow: 0 1px #b89a00;
+    transform: translateY(2px);
 }
 
 .game-board {
     display: grid;
     grid-template-columns: repeat(10, 40px);
     grid-template-rows: repeat(10, 40px);
-    gap: 2px;
+    gap: 3px;
 }
 
 .cell {
     width: 40px;
     height: 40px;
+    background: #c0c0c0;
+    border: 2px solid #999;
+    border-radius: 4px;
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+                inset 2px 2px 3px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
-    border-radius: 4px;
     user-select: none;
-}
-
-.cell.closed {
-    background-color: #ccc;
+    transition: background 0.1s;
 }
 
 .cell.open {
-    background-color: #e0e0e0;
+    background-color: #e6e6e6;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
 }
 
+.cell[data-value="1"] { color: #0044ff; }
+.cell[data-value="2"] { color: #008800; }
+.cell[data-value="3"] { color: #cc0000; }
+.cell[data-value="4"] { color: #000088; }
+.cell[data-value="5"] { color: #880000; }
+.cell[data-value="6"] { color: #008888; }
+.cell[data-value="7"] { color: #000000; }
+.cell[data-value="8"] { color: #777777; }
+
 .cell.flag {
-    background-color: #f5f542;
+    background-color: #fff6a3;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.35);
+    position: relative;
+}
+
+.cell.flag::after {
+    content: "🚩";
+    font-size: 20px;
 }
 
 .cell.mine {
-    background-color: #ff4d4d;
+    background-color: #ff6b6b;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+.cell.mine::after {
+    content: "💣";
+    font-size: 22px;
 }
 
 .cell.clicked-mine {
-    background-color: #ff0000;
+    background-color: #ff0000 ;
 }
