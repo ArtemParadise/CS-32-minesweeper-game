@@ -1,144 +1,203 @@
+/* --- СТИЛІ ДЛЯ СУЧАСНОГО ІНТЕРФЕЙСУ --- */
+
+:root {
+    --color-bg: #f5f7f9;        /* Світлий фон */
+    --color-primary: #4a90e2;   /* Основний синій */
+    --color-secondary: #f0f3f5; /* Фон контейнера */
+    --color-cell-closed: #ccd6e0; /* Закрита клітинка */
+    --color-cell-opened: #e9ecef; /* Відкрита клітинка */
+    --color-mine-hit: #ff6b6b;  /* Червоний (вибух) */
+    --color-text-dark: #333;
+    --cell-size: 35px; /* Розмір клітинки */
+}
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
-    background-color: #f0f0f0;
-    font-family: sans-serif;
-    user-select: none; /* Запобігає виділенню тексту */
+    background-color: var(--color-bg);
+    font-family: 'Roboto', sans-serif;
+    user-select: none;
+    color: var(--color-text-dark);
 }
 
-.game-container {
-    background-color: #c0c0c0; 
-    border: 6px solid;
-    border-color: #ffffff #808080 #808080 #ffffff; /* Ефект 3D-рамки */
-    padding: 10px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+.title {
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
 }
 
-/* Стилі заголовка (Header) */
+.game-wrapper {
+    background-color: var(--color-secondary);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- HEADER та ЛІЧИЛЬНИКИ --- */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    padding: 5px;
-    border: 3px solid;
-    border-color: #808080 #ffffff #ffffff #808080; /* Вдавлений ефект */
+    margin-bottom: 20px;
 }
 
-/* Лічильники (Counter) */
 .counter {
-    background-color: black;
-    color: red;
-    font-family: 'Digital-7', monospace; /* Імітація цифрового дисплея */
-    font-size: 24px;
-    padding: 2px 6px;
-    border: 1px solid red; 
-    min-width: 60px;
-    text-align: right;
-    font-weight: bold;
+    background-color: var(--color-text-dark);
+    color: #ff4d4d; /* Яскраво-червоний для цифрового вигляду */
+    font-weight: 700;
+    font-size: 1.4em;
+    padding: 5px 10px;
+    border-radius: 6px;
+    min-width: 70px;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
-/* Кнопка старту/скидання */
 .reset-button {
-    font-size: 24px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 1.8em;
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%; /* Кругла кнопка */
     cursor: pointer;
-    background-color: #c0c0c0;
-    border: 3px solid;
-    border-color: #ffffff #808080 #808080 #ffffff; /* Ефект випуклої кнопки */
-    padding: 0 4px;
-    line-height: 1; /* Для кращого центрування смайлика */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.reset-button:hover {
+    background: #3a7bd5;
 }
 
 .reset-button:active {
-    border-color: #808080 #ffffff #ffffff #808080; /* Ефект натискання (вдавлений) */
+    transform: scale(0.95);
 }
 
-/* Ігрове поле (Game Board) */
+/* --- ІГРОВЕ ПОЛЕ --- */
 .game-board {
     display: grid;
-    grid-template-columns: repeat(5, 30px);
-    grid-template-rows: repeat(3, 30px); 
-    border: 3px solid;
-    border-color: #808080 #ffffff #ffffff #808080; /* Вдавлений ефект */
+    border-radius: 4px;
+    overflow: hidden;
 }
 
-/* Стилі для всіх клітинок */
 .cell {
-    width: 30px;
-    height: 30px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 1em;
     cursor: pointer;
     box-sizing: border-box;
+    transition: background-color 0.1s ease;
 }
 
-/* --- СТАН: закрита клітинка --- */
+/* --- СТАНИ КЛІТИНКИ --- */
+
+/* 1. Закрита */
 .cell.closed {
-    background-color: #c0c0c0;
-    border: 3px solid;
-    border-color: #ffffff #808080 #808080 #ffffff; /* Випуклий вигляд */
+    background-color: var(--color-cell-closed);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cell.closed:hover {
+    background-color: #b0c4d8;
 }
 
 .cell.closed:active {
-    background-color: #dcdcdc; /* Невелике затемнення при натисканні */
-    border-color: #808080 #ffffff #ffffff #808080; /* Ефект натискання */
+    background-color: var(--color-cell-opened);
 }
 
-/* --- СТАН: відкрита клітинка (базовий вигляд) --- */
+/* 2. Прапорець */
+.cell.flagged {
+    color: var(--color-primary);
+    font-size: 1.2em;
+}
+
+/* 3. Відкрита */
 .cell.opened {
-    background-color: #dcdcdc; /* Світліший фон */
-    border: 1px solid #a0a0a0; /* Плоский, вдавлений вигляд */
+    background-color: var(--color-cell-opened);
+    border: 1px solid #d0d7de;
+    cursor: default;
 }
 
-.cell.opened.empty {
-    /* Порожня відкрита клітинка */
-    background-color: #dcdcdc;
-}
-
-
-/* --- СТАН: клітинка з прапорцем --- */
-.cell.closed.has-flag {
-    color: red;
-    font-size: 18px;
-    /* Зберігає випуклий вигляд */
-}
-
-/* Додатковий стан: прапорець на не-міні (показується після програшу) */
-.cell.closed.wrong-flag {
-    background-color: #ff9999; /* Рожевий фон для неправильного прапорця */
-    color: black;
-}
-
-
-/* --- СТАН: клітинка з міною --- */
-
-/* клітинка з міною, на яку натиснув користувач */
+/* 4. Міни */
 .cell.opened.mine-hit {
-    background-color: red; /* Червоний фон */
-    color: black;
-    font-size: 20px;
+    background-color: var(--color-mine-hit);
+    color: white;
 }
-
-/* клітинка з міною (показана після програшу) */
 .cell.opened.mine-revealed {
-    background-color: #dcdcdc;
-    color: black;
-    font-size: 20px;
+    background-color: #faebd7;
+    color: var(--color-text-dark);
+}
+
+/* Неправильний прапорець */
+.cell.opened.flagged.wrong-flag {
+    background-color: #ff9999;
+    color: var(--color-text-dark);
+    font-size: 1em;
 }
 
 
-/* --- КОЛЬОРИ ЦИФР (стандартні для Minesweeper) --- */
-.cell.number-1 { color: blue; }
-.cell.number-2 { color: green; }
-.cell.number-3 { color: red; }
-.cell.number-4 { color: navy; }
-.cell.number-5 { color: maroon; }
-.cell.number-6 { color: teal; }
-.cell.number-7 { color: black; }
-.cell.number-8 { color: gray; }
+/* --- КОЛЬОРИ ЦИФР --- */
+.cell.number-1 { color: #1e88e5; }
+.cell.number-2 { color: #43a047; }
+.cell.number-3 { color: #e53935; }
+.cell.number-4 { color: #5e35b1; }
+.cell.number-5 { color: #ff8f00; }
+.cell.number-6 { color: #00acc1; }
+.cell.number-7 { color: #000000; }
+.cell.number-8 { color: #808080; }
+
+
+/* --- ПОВІДОМЛЕННЯ ПРО ЗАВЕРШЕННЯ ГРИ --- */
+.message-overlay {
+    position: fixed; /* Використовуємо fixed, щоб покрити весь viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Високий z-index */
+}
+
+.message-overlay.hidden {
+    display: none;
+}
+
+.message-box {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+#final-message {
+    color: var(--color-text-dark);
+    margin-bottom: 20px;
+}
+
+#play-again-button {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.2s;
+}
+
+#play-again-button:hover {
+    background-color: #3a7bd5;
+}
