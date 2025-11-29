@@ -1,0 +1,159 @@
+:root {
+  --bg-color: #c0c0c0;
+  --border-light: #ffffff;
+  --border-dark: #808080;
+  --border-darkest: #000000;
+  --cell-size: 30px;
+}
+
+body {
+  background-color: #2c3e50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.game-container {
+  background-color: var(--bg-color);
+  padding: 10px;
+  border-top: 3px solid var(--border-light);
+  border-left: 3px solid var(--border-light);
+  border-right: 3px solid var(--border-dark);
+  border-bottom: 3px solid var(--border-dark);
+  display: inline-block;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-color);
+  border: 3px solid;
+  border-color: var(--border-dark) var(--border-light) var(--border-light)
+    var(--border-dark);
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.counter-box {
+  background-color: black;
+  color: red;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border: 2px solid;
+  border-color: var(--border-dark) var(--border-light) var(--border-light)
+    var(--border-dark);
+  min-width: 50px;
+  text-align: center;
+}
+
+.btn-start {
+  width: 36px;
+  height: 36px;
+  background-color: var(--bg-color);
+  border-top: 2px solid var(--border-light);
+  border-left: 2px solid var(--border-light);
+  border-right: 2px solid var(--border-dark);
+  border-bottom: 2px solid var(--border-dark);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+
+.btn-start:active {
+  border-top: 2px solid var(--border-dark);
+  border-left: 2px solid var(--border-dark);
+  border-right: 2px solid var(--border-light);
+  border-bottom: 2px solid var(--border-light);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, var(--cell-size));
+  border: 4px solid;
+  border-color: var(--border-dark) var(--border-light) var(--border-light)
+    var(--border-dark);
+}
+
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: var(--bg-color);
+  border-top: 3px solid var(--border-light);
+  border-left: 3px solid var(--border-light);
+  border-right: 3px solid var(--border-dark);
+  border-bottom: 3px solid var(--border-dark);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: default;
+}
+
+.cell.opened {
+  border: 1px solid #999;
+  border-right: none;
+  border-bottom: none;
+  background-color: #c0c0c0;
+}
+
+.cell.flagged {
+  color: red;
+}
+
+.cell.mine {
+  background-color: #c0c0c0;
+  border: 1px solid #999;
+}
+
+.cell.exploded {
+  background-color: red;
+  border: 1px solid #999;
+}
+
+.cell.flagged-wrong {
+  background-color: #c0c0c0;
+  border: 1px solid #999;
+  color: red;
+  position: relative;
+}
+.cell.flagged-wrong::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.type-1 {
+  color: blue;
+}
+.type-2 {
+  color: green;
+}
+.type-3 {
+  color: red;
+}
+.type-4 {
+  color: darkblue;
+}
+.type-5 {
+  color: darkred;
+}
+.type-6 {
+  color: teal;
+}
+.type-7 {
+  color: black;
+}
+.type-8 {
+  color: gray;
+}
